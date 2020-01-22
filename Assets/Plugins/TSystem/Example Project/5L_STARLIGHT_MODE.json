@@ -1,0 +1,36 @@
+{
+    "name": "5L STARLIGHT",
+    "description": "Starlight Stage simulation mode.",
+    "basis": 0,
+
+    "lineSet":
+    [
+        {
+            "count": 5,
+            "startPosX": [-429, -214.5, 0, 214.5, 429],
+            "startPosY": [309, 309, 309, 309, 309],
+            "startPosTilt": [0, 0, 0, 0, 0],
+            "endPosX": [-589, -294.5, 0, 294.5, 589],
+            "endPosY": [-356, -356, -356, -356, -356],
+            "endPosTilt": [0, 0, 0, 0, 0]
+        }
+    ],
+
+    "borderLeft": -960,
+    "borderRight": 960,
+    "borderUp": 270,
+    "borderDown": -540,
+    "judgeRule": 0,
+    "judgeHalfWidth": 147.25,
+    "judgeThreshold": [0.015, 0.04, 0.06, 0.08, 0.10, 0.15],
+    "judgeHFSThreshold": [0.015, 0.06, 0.08, 0.1, 0.12, 0.18],
+
+    "useScaledTForPath": true,
+    "useScaledTForScale": false,
+    "scaledT": "2*t/(t+1)",
+
+    "pathX": "T",
+    "pathY": "(-800f*T*(1-T)+390f*T)/390f",
+    "scaleX": "if(t<0.25f, (6f/5)*t, (14f/15)*t+(1f/15))",
+    "scaleY": "if(t<0.25f, (6f/5)*t, (14f/15)*t+(1f/15))"
+}
