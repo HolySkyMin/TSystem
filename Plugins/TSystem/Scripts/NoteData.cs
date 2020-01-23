@@ -96,11 +96,17 @@ namespace TSystem
             {
                 if (sst.prevNoteId <= 0)
                     type = NoteType.SlideStart;
-                else if (sst.nextNoteId <= 0)
-                    type = NoteType.SlideEnd;
                 else
                     type = NoteType.SlideMiddle;
             }
+        }
+
+        public NoteData Clone()
+        {
+            var newData = new NoteData(id, size, time, speed, startLine, endLine, type, flick, color, new List<int>());
+            for (int i = 0; i < prevIds.Count; i++)
+                newData.prevIds.Add(prevIds[i]);
+            return newData;
         }
     }
 }

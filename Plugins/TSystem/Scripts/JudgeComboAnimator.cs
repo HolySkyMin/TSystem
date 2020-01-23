@@ -19,7 +19,7 @@ namespace TSystem
             {
                 if (t < 0.2f)
                 {
-                    body.localScale = Vector3.one * (0.5f + t * 5);
+                    body.localScale = Vector3.one * (Mathf.Min(0.5f + t * 5, 1));
                     t += Time.deltaTime;
                 }
                 else

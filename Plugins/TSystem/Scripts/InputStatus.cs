@@ -76,12 +76,14 @@ namespace TSystem
             holdingNote = holding;
         }
 
-        public void StartFlickCheck(int finger, FlickType flick, Vector2 startPos)
+        public void StartFlickCheck(int finger, FlickType flick, Vector2 startPos, Vector2 deltaPos)
         {
             touchingFinger = finger;
             flickStarted = true;
             flickDirection = flick;
             flickStartPos = startPos;
+
+            UpdateFlickCheck(startPos + deltaPos);
         }
 
         public void UpdateFlickCheck(Vector2 curPos)

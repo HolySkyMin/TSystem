@@ -41,7 +41,7 @@ namespace TSystem.Example
 
             TSystemStatic.ingamePacket = new IngamePacket()
             {
-                beatmap = new BeatmapData() { path = resourceBeatmapPath },
+                beatmap = new BeatmapData() { path = resourceBeatmapPath, type = BeatmapType.SSTrain },
                 musicPath = resourceMusicPath,
                 bgaPath = resourceBGAPath,
                 backImagePath = resourceBackImagePath,
