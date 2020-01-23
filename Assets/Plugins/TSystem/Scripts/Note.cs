@@ -73,12 +73,6 @@ namespace TSystem
 
             startPos = Game.Mode.GetStartPos(lineSet, StartLine);
             endPos = Game.Mode.GetEndPos(lineSet, EndLine);
-
-            image.sprite = Game.GetNoteImage(data);
-            if (Game.IsNoteColored)
-                image.color = ColorKey;
-            if (image.sprite == null)
-                image.color = Color.clear;
         }
 
         public void CreateTail()
@@ -163,6 +157,8 @@ namespace TSystem
                         isHit = true;
                         isDead = true;
                         Judge(true, true);
+                        if (Type == NoteType.SlideMiddle)
+                            Delete();
                     }
                 }
             }
@@ -176,6 +172,12 @@ namespace TSystem
                 }
                 Game.judge.noteQueue[EndLine].Add(ID);
             }
+
+            image.sprite = Game.GetNoteImage(data);
+            if (Game.IsNoteColored)
+                image.color = ColorKey;
+            if (image.sprite == null)
+                image.color = Color.clear;
 
             if (nextTail != null)
                 nextTail.gameObject.SetActive(true);
@@ -214,7 +216,10 @@ namespace TSystem
                     if (note.Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && note.isDead)
                     {
                         isDead = true;
-                        Judge(true);
+                        if (Type == NoteType.SlideMiddle)
+                            Game.judge.noteQueue[EndLine].Remove(ID);
+                        Judge(true, true);
+                        Delete();
                     }
                     if (Type.IsEither(NoteType.SlideMiddle, NoteType.SlideEnd) && note.Type.IsEither(NoteType.SlideStart, NoteType.SlideMiddle))
                     {
@@ -222,7 +227,7 @@ namespace TSystem
                     }
                 }
             }
-            if (Type == NoteType.SlideStart && nextNote.isDead)
+            if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
                 Delete();
         }
 
@@ -234,7 +239,7 @@ namespace TSystem
                 if(Type == NoteType.SlideStart && (isHit || Progress >= 1))
                 {
                     var progress = (nextNote.ReachTime - Game.Time) / (nextNote.ReachTime - Mathf.Min(hitTime, ReachTime));
-                    Body.anchoredPosition = Vector2.Lerp(endPos, nextNote.endPos, progress);
+                    Body.anchoredPosition = Vector2.Lerp(nextNote.endPos, endPos, progress);
                 }
                 else
                 {
@@ -319,6 +324,23 @@ namespace TSystem
                     }
                     break;
             }
+
+            if (!isHit && TimeDistance >= Game.Mode.judgeThreshold[5])   // So, when the note is not hit and reached the end...
+            {
+                Judge(true);
+                if (Type == NoteType.HoldEnd)
+                    foreach (var note in previousNotes)
+                        if (note.Type == NoteType.HoldStart)
+                            note.Delete();
+                if(Type == NoteType.SlideStart)
+                {
+                    Game.judge.noteQueue[EndLine].Remove(ID);
+                    Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), JudgeType.Miss, false, false);
+                    Game.AddScore(data, JudgeType.Miss);
+                    isDead = true;
+                    Delete();
+                }
+            }
         }
 
         protected virtual void GetInput()
@@ -337,7 +359,7 @@ namespace TSystem
 
         public void AppendNoteData(NoteData newData, NoteType targetType)
         {
-            data = newData;
+            data = newData.Clone();
             data.type = targetType;
         }
 
@@ -365,6 +387,12 @@ namespace TSystem
             prev.nextTail = nextTail;
             prev.nextTail.headNote = prev;
             prev.nextNote = nextNote;
+            nextTail = null;
+
+            nextNote.previousNotes.Remove(this);
+            nextNote.previousNotes.Add(prev);
+
+            slideTransfered = true;
         }
 
         public void Judge(bool fixAsMiss = false, bool silent = false)
@@ -378,12 +406,15 @@ namespace TSystem
             if (res == JudgeType.NotJudged)
                 return;
 
-            // Processing
-            isHit = true;
-            Game.judge.noteQueue[EndLine].Remove(ID);
+            // Processing (Slide Middle SAVES the judge, not executing it.)
+            if(Type != NoteType.SlideMiddle)
+            {
+                isHit = true;
+                Game.judge.noteQueue[EndLine].Remove(ID);
 
-            Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), res, Flick != FlickType.NotFlick, silent);
-            Game.AddScore(data, res);
+                Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), res, Flick != FlickType.NotFlick, silent);
+                Game.AddScore(data, res);
+            }
 
             if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && res == JudgeType.Miss)
                 isDead = true;

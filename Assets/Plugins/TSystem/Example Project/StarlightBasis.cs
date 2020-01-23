@@ -81,8 +81,6 @@ namespace TSystem.Example
             var newNote = newObj.GetComponent<Note>();
             newNote.Set(data, curLineSet);
             newNote.halfTailWidth = 80;
-            newNote.CreateTail();
-            newNote.CreateConnector();
             notes.Add(newNote.ID, newNote);
             if ((int)newNote.Type < 10)
                 ValidNoteCount++;
@@ -92,6 +90,15 @@ namespace TSystem.Example
                     NoteType.SlideDummy, data.flick, data.color, new List<int>()));
 
             
+        }
+
+        protected override void AfterNoteLoading()
+        {
+            foreach(var note in notes)
+            {
+                note.Value.CreateTail();
+                note.Value.CreateConnector();
+            }
         }
 
         public override void AddScore(NoteData data, JudgeType result)

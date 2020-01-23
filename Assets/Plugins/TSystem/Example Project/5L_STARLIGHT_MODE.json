@@ -22,8 +22,8 @@
     "borderDown": -540,
     "judgeRule": 0,
     "judgeHalfWidth": 147.25,
-    "judgeThreshold": [0.015, 0.04, 0.06, 0.08, 0.10, 0.15],
-    "judgeHFSThreshold": [0.015, 0.06, 0.08, 0.1, 0.12, 0.18],
+    "judgeThreshold": [0.016, 0.06, 0.9, 0.12, 0.15, 0.25],
+    "judgeHFSThreshold": [0.016, 0.09, 0.12, 0.15, 0.18, 0.25],
 
     "useScaledTForPath": true,
     "useScaledTForScale": false,

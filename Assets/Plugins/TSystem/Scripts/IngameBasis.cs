@@ -143,8 +143,16 @@ namespace TSystem
                 }
             }
 
+            AfterNoteLoading();
+
+            input.Initialize();
             // OK. Now we are ready to play!
             ReadyToPlay = true;
+        }
+
+        protected virtual void AfterNoteLoading()
+        {
+
         }
 
         public void StartGame()

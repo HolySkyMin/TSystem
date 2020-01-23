@@ -50,36 +50,149 @@ namespace TSystem
 
         void Update()
         {
-            var validTouch = new Dictionary<float, Touch>();
+            var normalTouch = new Dictionary<float, Touch>();
+            var holdingTouch = new Dictionary<float, Touch>();
+            var flickingTouch = new Dictionary<float, Touch>();
+            var slidingTouch = new List<Touch>();
+
             foreach(var touch in Input.touches)
             {
                 var pos = Game.GetTouchPos(touch.position);
                 foreach (var line in lineEnd)
                 {
                     if (isValidTouch[Game.Mode.judgeRule](line.Key, pos))
-                        validTouch.Add(line.Key, touch);
-                    else if (lineInput[line.Key].touchingFinger == touch.fingerId)
-                        validTouch.Add(line.Key, touch);
-                    else if (slidingFinger.Contains(touch.fingerId))
-                        validTouch.Add(line.Key, touch);
+                        normalTouch.Add(line.Key, touch);
+                    if(lineInput[line.Key].touchingFinger == touch.fingerId)
+                    {
+                        if (lineInput[line.Key].isHolding)
+                            holdingTouch.Add(line.Key, touch);
+                        if (lineInput[line.Key].flickStarted)
+                        {
+                            flickingTouch.Add(line.Key, touch);
+                            if (normalTouch.ContainsKey(line.Key))
+                                normalTouch.Remove(line.Key);
+                        }
+                    }
                 }
+                if (slidingFinger.Contains(touch.fingerId))
+                    slidingTouch.Add(touch);
             }
 
-            // For each VALID touch...
-            foreach(var touch in validTouch)
+            // Process rule: normal -> flicking -> holding -> sliding
+
+            foreach(var touch in normalTouch)
             {
                 var pos = Game.GetTouchPos(touch.Value.position);
                 var line = lineInput[touch.Key];
 
+                if (line.GetTargetNote() != null && line.GetTargetNote().TimeDistance >= -Game.Mode.judgeThreshold[5])
+                {
+                    var target = line.GetTargetNote();
+
+                    // If it's FLICK, start flick checking.
+                    if (!line.flickStarted && target.Flick != FlickType.NotFlick && touch.Value.phase.IsEither(TouchPhase.Stationary, TouchPhase.Moved))
+                        line.StartFlickCheck(touch.Value.fingerId, target.Flick, pos, Game.GetTouchPos(touch.Value.deltaPosition));
+                    else
+                    {
+                        // Switching by target's TYPE...
+                        switch (target.Type)
+                        {
+                            case NoteType.Tap:
+                            case NoteType.Hidden:
+                                if (touch.Value.phase == TouchPhase.Began)
+                                    target.Judge();
+                                break;
+                            case NoteType.Damage:
+                                if (touch.Value.phase == TouchPhase.Began)
+                                    target.Judge(true);
+                                break;
+                            case NoteType.HoldStart:
+                                if (touch.Value.phase == TouchPhase.Began)
+                                {
+                                    target.Judge();
+                                    if (target.isHit && !target.isDead)
+                                        line.SetHold(touch.Value.fingerId, target.ID);
+                                }
+                                break;
+                            case NoteType.SlideStart:
+                                if (touch.Value.phase == TouchPhase.Began)
+                                {
+                                    target.Judge();
+                                    if (target.isHit && !target.isDead)
+                                    {
+                                        slidingFinger.Add(touch.Value.fingerId);
+                                        slidingNote.Add(target.ID);
+                                        target.slideGroupFinger = touch.Value.fingerId;
+                                    }
+                                }
+                                break;
+                            case NoteType.SlideMiddle:
+                                if (touch.Value.fingerId == target.slideGroupFinger && touch.Value.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
+                                    target.Judge();
+                                break;
+                            case NoteType.SlideEnd:
+                                if (touch.Value.fingerId == target.slideGroupFinger && touch.Value.phase == TouchPhase.Ended)
+                                {
+                                    target.Judge();
+                                    slidingNote.RemoveAt(slidingFinger.IndexOf(touch.Value.fingerId));
+                                    slidingFinger.Remove(touch.Value.fingerId);
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+
+            foreach(var touch in flickingTouch)
+            {
+                var pos = Game.GetTouchPos(touch.Value.position);
+                var line = lineInput[touch.Key];
+                var target = line.GetTargetNote();
+
+                if (touch.Value.phase == TouchPhase.Moved)
+                {
+                    // Update flick pos information, and check if enough.
+                    line.UpdateFlickCheck(pos);
+                    if (line.IsFlickEnough() && target.TimeDistance >= -Game.Mode.judgeThreshold[5])
+                    {
+                        target.Judge();
+                        if (target.isHit)
+                        {
+                            line.flickStarted = false;
+                            line.touchingFinger = 100;
+                            if (target.Type == NoteType.HoldEnd)
+                                line.isHolding = false;
+                            if (target.Type == NoteType.SlideEnd)
+                            {
+                                slidingNote.RemoveAt(slidingFinger.IndexOf(target.slideGroupFinger));
+                                slidingFinger.Remove(target.slideGroupFinger);
+                            }
+                        }
+                    }
+                }
+                else if (touch.Value.phase == TouchPhase.Ended)
+                {
+                    // Roll back everything.
+                    line.flickStarted = false;
+                    line.touchingFinger = 100;
+                }
+            }
+
+            foreach(var touch in holdingTouch)
+            {
+                var pos = Game.GetTouchPos(touch.Value.position);
+                var line = lineInput[touch.Key];
+                var target = line.GetTargetNote();
+
                 // Holding and RELEASED,
-                if (line.isHolding && line.touchingFinger == touch.Value.fingerId && touch.Value.phase == TouchPhase.Ended)
+                if (touch.Value.phase == TouchPhase.Ended)
                 {
                     // If at proper location,
-                    if(isValidTouch[Game.Mode.judgeRule](touch.Key, pos))
+                    if (isValidTouch[Game.Mode.judgeRule](touch.Key, pos))
                     {
                         // If 1) target note exists and 2) target note is hold-end and 3) target note is not flick,
-                        if(line.GetTargetNote() != null && line.GetTargetNote().Type == NoteType.HoldEnd && line.GetTargetNote().Flick == FlickType.NotFlick)
-                            line.GetTargetNote().Judge();
+                        if (target != null && target.Type == NoteType.HoldEnd && target.Flick == FlickType.NotFlick)
+                            target.Judge();
                         else
                         {
                             // Else, it's MISS.
@@ -96,106 +209,36 @@ namespace TSystem
                             Game.notes[line.holdingNote].Delete();
                     }
                     line.isHolding = false;
-                }
-
-                // Flicking
-                if(line.flickStarted && line.touchingFinger == touch.Value.fingerId)
-                {
-                    // If MOVED,
-                    if(touch.Value.phase == TouchPhase.Moved)
-                    {
-                        // Update flick pos information, and check if enough.
-                        line.UpdateFlickCheck(pos);
-                        if(line.IsFlickEnough())
-                        {
-                            line.GetTargetNote().Judge();
-                            line.flickStarted = false;
-                            line.touchingFinger = 100;
-                            if (line.GetTargetNote().Type == NoteType.HoldEnd)
-                                line.isHolding = false;
-                            if (line.GetTargetNote().Type == NoteType.SlideEnd)
-                            {
-                                slidingNote.RemoveAt(slidingFinger.IndexOf(line.GetTargetNote().slideGroupFinger));
-                                slidingFinger.Remove(line.GetTargetNote().slideGroupFinger);
-                            }
-                        }
-                    }
-                    // Else if RELEASED,
-                    else if(touch.Value.phase == TouchPhase.Ended)
-                    {
-                        // Roll back everything.
-                        line.flickStarted = false;
-                        line.touchingFinger = 100;
-                    }
-                }
-
-                // Not touched before
-                // To start the input, target note should exists.
-                if(line.GetTargetNote() != null)
-                {
-                    var target = line.GetTargetNote();
-
-                    // If it's FLICK, start flick checking.
-                    if (target.Flick != FlickType.NotFlick && touch.Value.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
-                        line.StartFlickCheck(touch.Value.fingerId, target.Flick, pos);
-                    else
-                    {
-                        // Switching by target's TYPE...
-                        switch(target.Type)
-                        {
-                            case NoteType.Tap:
-                            case NoteType.Hidden:
-                                if(touch.Value.phase == TouchPhase.Began)
-                                    target.Judge();
-                                break;
-                            case NoteType.Damage:
-                                if (touch.Value.phase == TouchPhase.Began)
-                                    target.Judge(true);
-                                break;
-                            case NoteType.HoldStart:
-                                if(touch.Value.phase == TouchPhase.Began)
-                                {
-                                    target.Judge();
-                                    if (target.isHit && !target.isDead)
-                                        line.SetHold(touch.Value.fingerId, target.ID);
-                                }
-                                break;
-                            case NoteType.SlideStart:
-                                if(touch.Value.phase == TouchPhase.Began)
-                                {
-                                    target.Judge();
-                                    if(target.isHit && !target.isDead)
-                                    {
-                                        slidingFinger.Add(touch.Value.fingerId);
-                                        slidingNote.Add(target.ID);
-                                        target.slideGroupFinger = touch.Value.fingerId;
-                                    }
-                                }
-                                break;
-                            case NoteType.SlideMiddle:
-                                if (touch.Value.fingerId == target.slideGroupFinger && touch.Value.phase.IsEither(TouchPhase.Stationary, TouchPhase.Moved))
-                                    target.Judge();
-                                break;
-                            case NoteType.SlideEnd:
-                                if(touch.Value.fingerId == target.slideGroupFinger && touch.Value.phase == TouchPhase.Ended)
-                                {
-                                    target.Judge();
-                                    slidingNote.RemoveAt(slidingFinger.IndexOf(touch.Value.fingerId));
-                                    slidingFinger.Remove(touch.Value.fingerId);
-                                }
-                                break;
-                        }
-                    }
-                }
-
-                // Sliding
-                if(slidingFinger.Contains(touch.Value.fingerId) && touch.Value.phase == TouchPhase.Ended)
-                {
-                    Game.notes[slidingNote[slidingFinger.IndexOf(touch.Value.fingerId)]].isDead = true;
-                    slidingNote.RemoveAt(slidingFinger.IndexOf(touch.Value.fingerId));
-                    slidingFinger.Remove(touch.Value.fingerId);
+                    line.touchingFinger = 100;
                 }
             }
+
+            foreach(var touch in slidingTouch)
+            {
+                if (slidingFinger.Contains(touch.fingerId) && touch.phase == TouchPhase.Ended)
+                {
+                    Game.notes[slidingNote[slidingFinger.IndexOf(touch.fingerId)]].isDead = true;
+                    slidingNote.RemoveAt(slidingFinger.IndexOf(touch.fingerId));
+                    slidingFinger.Remove(touch.fingerId);
+                }
+            }
+
+            //// Slide Last Check
+            //foreach(var id in slidingFinger)
+            //{
+            //    bool flag = false;
+            //    foreach(var touch in slidingTouch)
+            //    {
+            //        if (touch.fingerId == id)
+            //            flag = true;
+            //    }
+            //    if(!flag)
+            //    {
+            //        Game.notes[slidingNote[slidingFinger.IndexOf(id)]].isDead = true;
+            //        slidingNote.RemoveAt(slidingFinger.IndexOf(id));
+            //        slidingFinger.Remove(id);
+            //    }
+            //}
         }
     }
 }
