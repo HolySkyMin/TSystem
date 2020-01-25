@@ -92,7 +92,7 @@ namespace TSystem
                     // If it's FLICK, start flick checking.
                     if (!line.flickStarted && target.Flick != FlickType.NotFlick && touch.Value.phase.IsEither(TouchPhase.Stationary, TouchPhase.Moved))
                         line.StartFlickCheck(touch.Value.fingerId, target.Flick, pos, Game.GetTouchPos(touch.Value.deltaPosition));
-                    else
+                    else if(target.Flick == FlickType.NotFlick)
                     {
                         // Switching by target's TYPE...
                         switch (target.Type)
@@ -222,23 +222,6 @@ namespace TSystem
                     slidingFinger.Remove(touch.fingerId);
                 }
             }
-
-            //// Slide Last Check
-            //foreach(var id in slidingFinger)
-            //{
-            //    bool flag = false;
-            //    foreach(var touch in slidingTouch)
-            //    {
-            //        if (touch.fingerId == id)
-            //            flag = true;
-            //    }
-            //    if(!flag)
-            //    {
-            //        Game.notes[slidingNote[slidingFinger.IndexOf(id)]].isDead = true;
-            //        slidingNote.RemoveAt(slidingFinger.IndexOf(id));
-            //        slidingFinger.Remove(id);
-            //    }
-            //}
         }
     }
 }

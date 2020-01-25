@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResultPacket : MonoBehaviour
+namespace TSystem
 {
-    // Start is called before the first frame update
-    void Start()
+    public class ResultPacket
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public bool autoPlay;
+        public bool mirror;
+        public TSystemMode gameMode;
+        public BeatmapData beatmap;
+        public Dictionary<JudgeType, int> judgeList;
     }
 }

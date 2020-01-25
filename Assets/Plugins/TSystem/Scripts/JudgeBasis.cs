@@ -92,5 +92,7 @@ namespace TSystem
                 comboText.Show(comboCount);
             }
         }
+
+        public Dictionary<JudgeType, int> ExportJudgeResult() => judgeResult;
     }
 }

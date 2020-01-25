@@ -7,16 +7,13 @@ namespace TSystem.Example
 {
     public class StarlightBasis : IngameBasis
     {
-        private int systemNoteIdx = -1;
-        private int lastValidNoteIdx;
-        private float lastReachTime = -100;
-
         protected override void Awake()
         {
             // TODO: Flexible flick threshold
             flickThreshold = 80;
             Tail.FixTailPosAtZero = true;
             Connector.HalfWidthCoeff = 0.5f;
+            maxReachTime = 0;
 
             base.Awake();
         }
@@ -89,7 +86,7 @@ namespace TSystem.Example
                 CreateNote(new NoteData(data.id, data.size, data.time, data.speed, data.startLine, data.endLine,
                     NoteType.SlideDummy, data.flick, data.color, new List<int>()));
 
-            
+            maxReachTime = Mathf.Max(maxReachTime, data.time);
         }
 
         protected override void AfterNoteLoading()

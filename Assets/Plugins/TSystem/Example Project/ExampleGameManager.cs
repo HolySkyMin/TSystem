@@ -20,9 +20,13 @@ namespace TSystem.Example
         public TextAsset modeFile;
 
         public GameObject tSystem;
+        public GameObject endText, fullComboText;
+
+        bool isEndAnimated;
 
         private void Start()
         {
+            isEndAnimated = false;
             StartTSystem();
         }
 
@@ -41,7 +45,7 @@ namespace TSystem.Example
 
             TSystemStatic.ingamePacket = new IngamePacket()
             {
-                beatmap = new BeatmapData() { path = resourceBeatmapPath, type = BeatmapType.SSTrain },
+                beatmap = new BeatmapData() { path = resourceBeatmapPath, type = BeatmapType.TWx},
                 musicPath = resourceMusicPath,
                 bgaPath = resourceBGAPath,
                 backImagePath = resourceBackImagePath,
@@ -56,6 +60,19 @@ namespace TSystem.Example
             Debug.Log(TSystemStatic.ingamePacket.gameMode.judgeThreshold.Length);
             TSystemStatic.ingamePacket.gameMode.SetArguments();
             tSystem.SetActive(true);
+        }
+
+        private void Update()
+        {
+            if(IngameBasis.Now.IsEnded && !isEndAnimated)
+            {
+                if (!TSystemStatic.resultPacket.judgeList.ContainsKey(JudgeType.Nice) &&
+                    !TSystemStatic.resultPacket.judgeList.ContainsKey(JudgeType.Bad) &&
+                    !TSystemStatic.resultPacket.judgeList.ContainsKey(JudgeType.Miss))
+                    fullComboText.SetActive(true);
+                endText.SetActive(true);
+                isEndAnimated = true;
+            }
         }
 
         public void PauseGame()
