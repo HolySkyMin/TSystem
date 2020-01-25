@@ -178,6 +178,8 @@ namespace TSystem
                 image.color = ColorKey;
             if (image.sprite == null)
                 image.color = Color.clear;
+            if (Type == NoteType.Hidden)
+                image.color = Color.clear;
 
             if (nextTail != null)
                 nextTail.gameObject.SetActive(true);
@@ -345,7 +347,7 @@ namespace TSystem
 
         protected virtual void GetInput()
         {
-            if(Game.IsAutoPlay && (int)Type < 10)
+            if(Game.IsAutoPlay && (int)Type < 10 && Type != NoteType.Hidden)
             {
                 if (Progress >= 1 && !isHit)
                     Judge();

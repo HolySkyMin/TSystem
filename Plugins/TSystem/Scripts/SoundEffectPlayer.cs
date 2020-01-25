@@ -4,20 +4,25 @@ using UnityEngine;
 
 namespace TSystem
 {
-    [RequireComponent(typeof(AudioSource))]
     public class SoundEffectPlayer : MonoBehaviour
     {
-        public AudioClip goodHit, badHit, flickHit;
+        public AudioSource goodHit, badHit, flickHit;
+
+        private void Start()
+        {
+            goodHit.volume = TSystemConfig.Now.effectVolume;
+            badHit.volume = TSystemConfig.Now.effectVolume;
+            flickHit.volume = TSystemConfig.Now.effectVolume;
+        }
 
         public void PlayHitSound(bool good, bool flick)
         {
-            var source = GetComponent<AudioSource>();
-            if (flick)
-                source.PlayOneShot(flickHit, TSystemConfig.Now.effectVolume);
-            else if (good)
-                source.PlayOneShot(goodHit, TSystemConfig.Now.effectVolume);
+            if (!good)
+                badHit.Play();
+            else if (flick)
+                flickHit.Play();
             else
-                source.PlayOneShot(badHit, TSystemConfig.Now.effectVolume);
+                goodHit.Play();
         }
     }
 }
