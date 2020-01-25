@@ -42,4 +42,4 @@ To get access to TSystem classes and functions in your code, add namespace decla
 
 ## More informations
 
-See [wiki](https://github.com/thiEFcat/TSystem/wiki, Wiki Page) for Concept description and Documentation.
+See [wiki](https://github.com/thiEFcat/TSystem/wiki, "Wiki Page") for Concept description and Documentation.
