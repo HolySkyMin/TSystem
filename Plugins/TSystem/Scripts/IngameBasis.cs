@@ -61,6 +61,8 @@ namespace TSystem
 
         /************ Protected Field ************/
 
+        protected int systemNoteIdx = -1;
+        protected float maxReachTime;
         protected float songTime;
         protected bool hasError = false;
         protected List<LinePanel> linePanels = new List<LinePanel>();
@@ -93,6 +95,7 @@ namespace TSystem
 
             // Beatmap Loading
             bool parseSucceed = false;
+            maxReachTime = 0;
             switch(Packet.beatmap.type)
             {
                 case BeatmapType.TWx:
@@ -110,6 +113,7 @@ namespace TSystem
                 TSystemStatic.LogWarning("Failed to parse beatmap. Game will NOT be played.");
                 yield break;
             }
+            CreateNote(new NoteData(systemNoteIdx--, 0, maxReachTime, 1, 0, 0, NoteType.Ender, FlickType.NotFlick, Color.clear, new List<int>()));
 
             // Audio Loading
             if (!Packet.noMusic)
@@ -235,6 +239,14 @@ namespace TSystem
 
         public void EndGame()
         {
+            TSystemStatic.resultPacket = new ResultPacket()
+            {
+                judgeList = judge.ExportJudgeResult(),
+                gameMode = Mode,
+                beatmap = Packet.beatmap,
+                autoPlay = Packet.autoPlay,
+                mirror = Packet.mirror
+            };
             IsEnded = true;
         }
 

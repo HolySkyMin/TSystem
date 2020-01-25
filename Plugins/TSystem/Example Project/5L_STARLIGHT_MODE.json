@@ -2,6 +2,7 @@
     "name": "5L STARLIGHT",
     "description": "Starlight Stage simulation mode.",
     "basis": 0,
+    "preferredLine": 5,
 
     "lineSet":
     [

@@ -12,6 +12,7 @@ namespace TSystem
         public string name;             // Displayed name of the mode
         public string description;      // Short description
         public int basis;               // Basis index that the mode uses
+        public int preferredLine;       // This helps you determine which file extension is fit.
 
         // Lines and positions of the mode
         public TSModeLineData[] lineSet;
