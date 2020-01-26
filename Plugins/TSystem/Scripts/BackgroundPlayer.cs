@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
@@ -14,6 +15,7 @@ namespace TSystem
         public bool loaded;
         public bool hasBgaError;
         public VideoPlayer videoPlayer;
+        public GameObject videoScreen;
         public RawImage imageFrame;
         public GameObject defaultBackground;
 
@@ -22,8 +24,12 @@ namespace TSystem
         public void LoadBGA(string path)
         {
             defaultBackground.SetActive(false);
+            videoScreen.SetActive(true);
             loaded = false;
             hasBgaError = false;
+
+            if (path == "")
+                return;
 
             if(Game.Packet.loadFromResources)
             {
@@ -61,23 +67,15 @@ namespace TSystem
             }
             else
             {
-                WWW www = null;
-
-                if (File.Exists(path))
+                var request = UnityWebRequestTexture.GetTexture(path);
+                yield return request.SendWebRequest();
+                if(request.isNetworkError || request.isHttpError)
+                    TSystemStatic.LogWarning("Error occured while loading background image.");
+                else
                 {
-                    www = new WWW(path);
-                    yield return www;
-
-                    try
-                    {
-                        imageFrame.texture = www.texture;
-                        imageFrame.gameObject.SetActive(true);
-                        loaded = true;
-                    }
-                    catch (System.Exception e)
-                    {
-                        TSystemStatic.LogWithException("Error occured while loading background image.", e);
-                    }
+                    imageFrame.texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                    imageFrame.gameObject.SetActive(true);
+                    loaded = true;
                 }
             }
         }
