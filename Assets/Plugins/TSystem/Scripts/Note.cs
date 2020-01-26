@@ -89,6 +89,7 @@ namespace TSystem
                     }
                     var newObj = Instantiate(Game.tailTemplate);
                     newObj.transform.SetParent(Game.meshParent);
+                    newObj.transform.localScale = Vector3.one;
                     newObj.name = "Tail " + prev.ID.ToString();
                     var newTail = newObj.GetComponent<Tail>();
                     newTail.Set(prev, this, false);
@@ -110,6 +111,7 @@ namespace TSystem
                     }
                     var newObj = Instantiate(Game.tailTemplate);
                     newObj.transform.SetParent(Game.meshParent);
+                    newObj.transform.localScale = Vector3.one;
                     newObj.name = "Tail " + prev.ID.ToString();
                     var newTail = newObj.GetComponent<Tail>();
                     newTail.Set(prev, this, true);
@@ -137,6 +139,7 @@ namespace TSystem
                     }
                     var newObj = Instantiate(Game.connectorTemplate);
                     newObj.transform.SetParent(Game.meshParent);
+                    newObj.transform.localScale = Vector3.one;
                     newObj.name = "Connector " + prev.ID.ToString();
                     var newConn = newObj.GetComponent<Connector>();
                     newConn.Set(prev, this);

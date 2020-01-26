@@ -21,7 +21,7 @@ namespace TSystem
         public TSystemConfig()
         {
             flickJudgeState = 1;
-            noteSpeed = 2;
+            noteSpeed = 1;
             gameSync = 0;
             musicVolume = 1;
             effectVolume = 1;

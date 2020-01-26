@@ -8,6 +8,7 @@ namespace TSystem
     {
         public bool autoPlay;
         public bool mirror;
+        public string songName;
         public TSystemMode gameMode;
         public BeatmapData beatmap;
         public Dictionary<JudgeType, int> judgeList;

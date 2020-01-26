@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace TSystem
 {
@@ -13,7 +14,7 @@ namespace TSystem
 
         public bool loaded;
 
-        public IEnumerator LoadMusic(string file)
+        public IEnumerator LoadMusic(string file, AudioType type)
         {
             loaded = false;
             if(Game.Packet.loadFromResources)
@@ -25,24 +26,16 @@ namespace TSystem
             }
             else
             {
-                WWW www = null;
-
-                if (File.Exists(file))
+                var request = UnityWebRequestMultimedia.GetAudioClip(file, type);
+                yield return request.SendWebRequest();
+                if(request.isNetworkError || request.isHttpError)
+                    TSystemStatic.LogWarning("Error occured while loading music.");
+                else
                 {
-                    www = new WWW(file);
-                    yield return www;
+                    GetComponent<AudioSource>().clip = ((DownloadHandlerAudioClip)request.downloadHandler).audioClip;
+                    GetComponent<AudioSource>().volume = TSystemConfig.Now.musicVolume;
 
-                    try
-                    {
-                        GetComponent<AudioSource>().clip = www.GetAudioClip(false, false);
-                        GetComponent<AudioSource>().volume = TSystemConfig.Now.musicVolume;
-
-                        loaded = true;
-                    }
-                    catch (Exception e)
-                    {
-                        TSystemStatic.LogWithException("Error occured while loading music.", e);
-                    }
+                    loaded = true;
                 }
             }
         }

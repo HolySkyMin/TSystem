@@ -82,6 +82,8 @@ namespace TSystem
 
         protected virtual IEnumerator Start()
         {
+            Mode.SetArguments();
+
             // Line construction
             for(int i = 0; i < Mode.lineSet.Length; i++)
             {
@@ -118,7 +120,7 @@ namespace TSystem
             // Audio Loading
             if (!Packet.noMusic)
             {
-                yield return musicPlayer.LoadMusic(Packet.musicPath);
+                yield return musicPlayer.LoadMusic(Packet.musicPath, Packet.musicType);
                 if(!musicPlayer.loaded)
                 {
                     TSystemStatic.LogWarning("Failed to load music. Game will be played without music.");
@@ -150,7 +152,7 @@ namespace TSystem
             AfterNoteLoading();
 
             input.Initialize();
-            // OK. Now we are ready to play!
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
             ReadyToPlay = true;
         }
 
@@ -200,6 +202,7 @@ namespace TSystem
                         var newObj = Instantiate(multiLineTemplate);
                         newObj.name = "Multiliner between " + activedNotes[i].ToString() + " and " + activedNotes[i + 1].ToString();
                         newObj.transform.SetParent(meshParent);
+                        newObj.transform.localScale = Vector3.one;
                         var newMulti = newObj.GetComponent<Multiliner>();
                         newMulti.Set(notes[activedNotes[i]], notes[activedNotes[i + 1]]);
                         newObj.SetActive(true);
@@ -241,6 +244,7 @@ namespace TSystem
         {
             TSystemStatic.resultPacket = new ResultPacket()
             {
+                songName = Packet.songName,
                 judgeList = judge.ExportJudgeResult(),
                 gameMode = Mode,
                 beatmap = Packet.beatmap,
@@ -248,6 +252,7 @@ namespace TSystem
                 mirror = Packet.mirror
             };
             IsEnded = true;
+            Screen.sleepTimeout = SleepTimeout.SystemSetting;
         }
 
         public Vector2 GetTouchPos(Vector3 raw)

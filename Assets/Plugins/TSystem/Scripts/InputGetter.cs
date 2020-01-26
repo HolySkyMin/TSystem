@@ -50,6 +50,9 @@ namespace TSystem
 
         void Update()
         {
+            if (Game.IsAutoPlay)
+                return;
+
             var normalTouch = new Dictionary<float, Touch>();
             var holdingTouch = new Dictionary<float, Touch>();
             var flickingTouch = new Dictionary<float, Touch>();
