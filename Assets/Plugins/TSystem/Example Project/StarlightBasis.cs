@@ -79,7 +79,7 @@ namespace TSystem.Example
             newNote.Set(data, curLineSet);
             newNote.halfTailWidth = 80;
             notes.Add(newNote.ID, newNote);
-            if ((int)newNote.Type < 10)
+            if ((int)newNote.Type < 10 && newNote.Type != NoteType.Hidden)
                 ValidNoteCount++;
 
             if (newNote.Type == NoteType.SlideStart)
