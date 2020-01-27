@@ -57,7 +57,7 @@ namespace TSystem
                     if (i == 0 && deltaTime <= Game.Mode.judgeThreshold[i])
                         return JudgeType.Fantastic;
                     else if (i != 0 && deltaTime.IsBetween((float)Game.Mode.judgeThreshold[i - 1], (float)Game.Mode.judgeThreshold[i], false, true))
-                        return (JudgeType)(5 - i);
+                        return (JudgeType)(6 - i);
                 }
             }
             return JudgeType.NotJudged;

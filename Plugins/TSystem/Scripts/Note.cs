@@ -60,7 +60,7 @@ namespace TSystem
             appearTime = ReachTime - (1f / (Speed * Game.NoteSpeed));
             for (int i = 0; i < data.prevIds.Count; i++)
             {
-                if (data.prevIds[i] > 0)
+                if (data.prevIds[i] > 0 && Type != NoteType.SlideDummy)
                 {
                     previousNotes.Add(Game.notes[data.prevIds[i]]);
                     Game.notes[data.prevIds[i]].nextNote = this;
@@ -312,7 +312,7 @@ namespace TSystem
                     }
                     break;
                 case NoteType.SlideDummy:
-                    if (Game.notes[ID].isHit || TimeDistance >= Game.Mode.judgeThreshold[5])
+                    if (Game.notes[data.prevIds[0]].isHit || TimeDistance >= Game.Mode.judgeThreshold[5])
                         Delete();
                     break;
                 default:
