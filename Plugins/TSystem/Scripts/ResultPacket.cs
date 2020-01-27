@@ -12,5 +12,6 @@ namespace TSystem
         public TSystemMode gameMode;
         public BeatmapData beatmap;
         public Dictionary<JudgeType, int> judgeList;
+        public int maxCombo;
     }
 }

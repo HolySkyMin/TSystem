@@ -246,6 +246,7 @@ namespace TSystem
             {
                 songName = Packet.songName,
                 judgeList = judge.ExportJudgeResult(),
+                maxCombo = judge.maxCombo,
                 gameMode = Mode,
                 beatmap = Packet.beatmap,
                 autoPlay = Packet.autoPlay,

@@ -19,11 +19,11 @@ namespace TSystem
 
         [HideInInspector] public int score;
         [HideInInspector] public int comboCount;
+        [HideInInspector] public int maxCombo = 0;
         [HideInInspector] public float percentage;
         [System.NonSerialized] public Dictionary<float, List<int>> noteQueue = new Dictionary<float, List<int>>();
 
         protected Dictionary<JudgeType, int> judgeResult = new Dictionary<JudgeType, int>();
-        protected int maxCombo = 0;
 
         public void AddLine(float line)
         {
