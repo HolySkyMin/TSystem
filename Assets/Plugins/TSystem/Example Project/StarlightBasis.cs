@@ -82,9 +82,9 @@ namespace TSystem.Example
             if ((int)newNote.Type < 10 && newNote.Type != NoteType.Hidden)
                 ValidNoteCount++;
 
-            if (newNote.Type == NoteType.SlideStart)
+            if (newNote.Type == NoteType.SlideStart && newNote.previousNotes.Count < 1)
                 CreateNote(new NoteData(data.id, data.size, data.time, data.speed, data.startLine, data.endLine,
-                    NoteType.SlideDummy, data.flick, data.color, new List<int>()));
+                    NoteType.SlideDummy, data.flick, data.color, new List<int>() { data.id }));
 
             maxReachTime = Mathf.Max(maxReachTime, data.time);
         }
