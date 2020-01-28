@@ -93,6 +93,9 @@ namespace TSystem
                 newPanel.GetComponent<LinePanel>().Set(i);
                 linePanels.Add(newPanel.GetComponent<LinePanel>());
                 newPanel.SetActive(true);
+
+                if (i != 0)
+                    newPanel.GetComponent<LinePanel>().fullBody.alpha = 0;
             }
 
             // Beatmap Loading
@@ -115,7 +118,9 @@ namespace TSystem
                 TSystemStatic.LogWarning("Failed to parse beatmap. Game will NOT be played.");
                 yield break;
             }
-            CreateNote(new NoteData(systemNoteIdx--, 0, maxReachTime, 1, 0, 0, NoteType.Ender, FlickType.NotFlick, Color.clear, new List<int>()));
+            CreateNote(new NoteData(systemNoteIdx--, 0, maxReachTime + 1, 1, 0, 0, NoteType.Ender, FlickType.NotFlick, Color.clear, new List<int>()));
+            ChangeLine(0);
+            AfterNoteLoading();
 
             // Audio Loading
             if (!Packet.noMusic)
@@ -149,8 +154,7 @@ namespace TSystem
                 }
             }
 
-            AfterNoteLoading();
-
+            // Game values initializing
             input.Initialize();
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             ReadyToPlay = true;
@@ -278,6 +282,33 @@ namespace TSystem
                     pos.Set((raw.x - (Camera.main.pixelWidth / 2f)) / Camera.main.pixelWidth * referenceWidth, (raw.y - (Camera.main.pixelHeight / 2f)) / Camera.main.pixelHeight * (referenceWidth * ((float)Camera.main.pixelHeight / Camera.main.pixelWidth)), 0);
             }
             return pos;
+        }
+
+        public virtual IEnumerator ChangeLine(int newLineSet)
+        {
+            var beforeLine = curLineSet;
+            curLineSet = newLineSet;
+
+            float t = 0;
+            while(t <= 0.25f / TimeSpeed)
+            {
+                linePanels[beforeLine].fullBody.alpha = 1 - t * 4 * TimeSpeed;
+                linePanels[newLineSet].fullBody.alpha = t * 4 * TimeSpeed;
+                t += UnityEngine.Time.deltaTime;
+                yield return null;
+            }
+            linePanels[beforeLine].fullBody.alpha = 0;
+            linePanels[newLineSet].fullBody.alpha = 1;
+        }
+
+        public virtual void TriggerSpecialEnter()
+        {
+            linePanels[curLineSet].SwitchToSpecial(0.25f / TimeSpeed);
+        }
+
+        public virtual void TriggerSpecialLeave()
+        {
+            linePanels[curLineSet].SwitchToLine(0.25f / TimeSpeed);
         }
 
         public void PlayHitEffect(int line)

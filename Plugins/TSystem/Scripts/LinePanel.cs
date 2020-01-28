@@ -7,16 +7,17 @@ namespace TSystem
     public class LinePanel : MonoBehaviour
     {
         public GameObject lineObjTemplate, specialObjTemplate;
-        public CanvasGroup linePanel, specialPanel;
+        public CanvasGroup fullBody, linePanel, specialPanel;
         public RectTransform lineParent, specialParent;
         public LineObject specialLineObj;
 
+        protected bool specialTriggered;
         protected Vector2 middlePos;
         List<LineObject> lineObjs = new List<LineObject>();
 
         public LineObject this[int index]
         {
-            get { return lineObjs[index]; }
+            get { return specialTriggered ? specialLineObj : lineObjs[index]; }
         }
 
         public void Set(int lineSet)
@@ -47,12 +48,14 @@ namespace TSystem
 
         public virtual void SwitchToSpecial(float duration)
         {
+            specialTriggered = true;
             StartCoroutine(SwitchingAnim(duration, false));
         }
 
         public virtual void SwitchToLine(float duration)
         {
-            StartCoroutine(SwitchingAnim(duration, false));
+            specialTriggered = false;
+            StartCoroutine(SwitchingAnim(duration, true));
         }
 
         IEnumerator SwitchingAnim(float duration, bool reversed)
@@ -73,6 +76,8 @@ namespace TSystem
                 t += Time.deltaTime;
                 yield return null;
             }
+            linePanel.alpha = reversed ? 1 : 0;
+            specialPanel.alpha = reversed ? 0 : 1;
         }
     }
 }

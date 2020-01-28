@@ -64,14 +64,17 @@ namespace TSystem
                 foreach (var line in lineEnd)
                 {
                     if (isValidTouch[Game.Mode.judgeRule](line.Key, pos))
-                        normalTouch.Add(line.Key, touch);
+                        if(!normalTouch.ContainsKey(line.Key))
+                            normalTouch.Add(line.Key, touch);
                     if(lineInput[line.Key].touchingFinger == touch.fingerId)
                     {
                         if (lineInput[line.Key].isHolding)
-                            holdingTouch.Add(line.Key, touch);
+                            if(!holdingTouch.ContainsKey(line.Key))
+                                holdingTouch.Add(line.Key, touch);
                         if (lineInput[line.Key].flickStarted)
                         {
-                            flickingTouch.Add(line.Key, touch);
+                            if(!flickingTouch.ContainsKey(line.Key))
+                                flickingTouch.Add(line.Key, touch);
                             if (normalTouch.ContainsKey(line.Key))
                                 normalTouch.Remove(line.Key);
                         }
