@@ -101,7 +101,7 @@ namespace TSystem.Example
         public override void AddScore(NoteData data, JudgeType result)
         {
             float BASE_SCORE = 1000;
-            float BASE_PERCENTAGE = 1f / ValidNoteCount;
+            float BASE_PERCENTAGE = 100f / ValidNoteCount;
 
             if (result == JudgeType.Fantastic)
             {
@@ -123,7 +123,7 @@ namespace TSystem.Example
                 BASE_SCORE *= 0.1f;
                 BASE_PERCENTAGE *= 0.1f;
             }
-            else
+            else if(result == JudgeType.Miss)
             {
                 BASE_SCORE = 0;
                 BASE_PERCENTAGE = 0;

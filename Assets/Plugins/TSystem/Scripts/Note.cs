@@ -311,6 +311,13 @@ namespace TSystem
                         Delete();
                     }
                     break;
+                case NoteType.LineChanger:
+                    if(Progress >= 1)
+                    {
+                        Game.StartCoroutine(Game.ChangeLine(Size));
+                        Delete();
+                    }
+                    break;
                 case NoteType.SlideDummy:
                     if (Game.notes[data.prevIds[0]].isHit || TimeDistance >= Game.Mode.judgeThreshold[5])
                         Delete();
@@ -325,7 +332,6 @@ namespace TSystem
                             foreach (var note in previousNotes)
                                 if (note.Type == NoteType.HoldStart)
                                     note.Delete();
-
                     }
                     break;
             }
