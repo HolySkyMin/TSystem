@@ -2494,6 +2494,7 @@ GameObject:
   - component: {fileID: 1038329967}
   - component: {fileID: 1038329969}
   - component: {fileID: 1038329968}
+  - component: {fileID: 1038329970}
   m_Layer: 5
   m_Name: Line Set Template
   m_TagString: Untagged
@@ -2536,6 +2537,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineObjTemplate: {fileID: 1367322679}
   specialObjTemplate: {fileID: 1918395228}
+  fullBody: {fileID: 1038329970}
   linePanel: {fileID: 623561805}
   specialPanel: {fileID: 467884443}
   lineParent: {fileID: 623561804}
@@ -2549,6 +2551,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038329966}
   m_CullTransparentMesh: 0
+--- !u!225 &1038329970
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038329966}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1096887712
 GameObject:
   m_ObjectHideFlags: 0
@@ -5685,6 +5699,7 @@ MonoBehaviour:
   soundPlayer: {fileID: 1877786442}
   score: 0
   comboCount: 0
+  maxCombo: 0
   percentage: 0
 --- !u!4 &2025864159
 Transform:
