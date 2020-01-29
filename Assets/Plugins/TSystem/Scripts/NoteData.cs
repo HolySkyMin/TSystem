@@ -57,7 +57,7 @@ namespace TSystem
                     type = NoteType.HoldStart;
                     break;
                 case 2:
-                    type = NoteType.SlideStart;
+                    type = prevIds.Count > 0 ? NoteType.SlideMiddle : NoteType.SlideStart;
                     break;
                 case 3:
                     type = NoteType.Damage;
