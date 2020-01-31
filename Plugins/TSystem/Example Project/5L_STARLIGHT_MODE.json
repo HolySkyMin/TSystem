@@ -31,7 +31,7 @@
     "scaledT": "2*t/(t+1)",
 
     "pathX": "T",
-    "pathY": "(-800f*T*(1-T)+390f*T)/390f",
-    "scaleX": "if(t<0.25f, (6f/5)*t, (14f/15)*t+(1f/15))",
-    "scaleY": "if(t<0.25f, (6f/5)*t, (14f/15)*t+(1f/15))"
+    "pathY": "((-800)*T*(1-T)+390*T)/390",
+    "scaleX": "t",
+    "scaleY": "t"
 }
