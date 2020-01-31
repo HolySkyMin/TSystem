@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Flee.PublicTypes;
+using B83.ExpressionParser;
 
 namespace TSystem
 {
@@ -44,22 +44,46 @@ namespace TSystem
         public double[] bezierScaleX;    // X value of Bezier control points for note scale
         public double[] bezierScaleY;    // Y value of Bezier control points for note scale
 
-        ExpressionContext context;
-        IGenericExpression<float> eScaledT, ePathX, ePathY, eScaleX, eScaleY;
+        //ExpressionContext context;
+        //IGenericExpression<float> eScaledT, ePathX, ePathY, eScaleX, eScaleY;
+        ExpressionDelegate eScaledT, ePathX, ePathY, eScaleX, eScaleY;
 
         public void SetArguments()
         {
-            context = new ExpressionContext();
-            context.Imports.AddType(typeof(System.Math));
+            //context = new ExpressionContext();
+            //context.Imports.AddType(typeof(System.Math));
 
-            // Context value reset
-            context.Variables["t"] = 0.0f;
-            context.Variables["T"] = 0.0f;
-            eScaledT = context.CompileGeneric<float>(scaledT);
-            ePathX = context.CompileGeneric<float>(pathX);
-            ePathY = context.CompileGeneric<float>(pathY);
-            eScaleX = context.CompileGeneric<float>(scaleX);
-            eScaleY = context.CompileGeneric<float>(scaleY);
+            //// Context value reset
+            //context.Variables["t"] = 0.0f;
+            //context.Variables["T"] = 0.0f;
+            //eScaledT = context.CompileGeneric<float>(scaledT);
+            //ePathX = context.CompileGeneric<float>(pathX);
+            //ePathY = context.CompileGeneric<float>(pathY);
+            //eScaleX = context.CompileGeneric<float>(scaleX);
+            //eScaleY = context.CompileGeneric<float>(scaleY);
+
+            var parser = new ExpressionParser();
+
+            if (useScaledTForPath || useScaledTForScale)
+            {
+                eScaledT = parser.EvaluateExpression(scaledT).ToDelegate("t");
+                _ = eScaledT(0);
+            }
+
+            if (!useBezierPath)
+            {
+                ePathX = parser.EvaluateExpression(pathX).ToDelegate(useScaledTForPath ? "T" : "t");
+                ePathY = parser.EvaluateExpression(pathY).ToDelegate(useScaledTForPath ? "T" : "t");
+                _ = ePathX(0);
+                _ = ePathY(0);
+            }
+            if(!useBezierScale)
+            {
+                eScaleX = parser.EvaluateExpression(scaleX).ToDelegate(useScaledTForScale ? "T" : "t");
+                eScaleY = parser.EvaluateExpression(scaleY).ToDelegate(useScaledTForScale ? "T" : "t");
+                _ = eScaleX(0);
+                _ = eScaleY(0);
+            }
         }
 
         public Vector2 GetStartPos(int set, float curLine)
@@ -247,11 +271,16 @@ namespace TSystem
             }
             else
             {
-                context.Variables["t"] = progress;
+                //context.Variables["t"] = progress;
+                //if (useScaledTForPath)
+                //    context.Variables["T"] = eScaledT.Evaluate();
+                //var computedX = ePathX.Evaluate();
+                //var computedY = ePathY.Evaluate();
+                var finalT = progress;
                 if (useScaledTForPath)
-                    context.Variables["T"] = eScaledT.Evaluate();
-                var computedX = ePathX.Evaluate();
-                var computedY = ePathY.Evaluate();
+                    finalT = (float)eScaledT(progress);
+                var computedX = (float)ePathX(finalT);
+                var computedY = (float)ePathY(finalT);
                 return new Vector2(Mathf.LerpUnclamped(start.x, end.x, computedX), Mathf.LerpUnclamped(start.y, end.y, computedY));
             }
         }
@@ -273,11 +302,16 @@ namespace TSystem
             }
             else
             {
-                context.Variables["t"] = progress;
+                //context.Variables["t"] = progress;
+                //if (useScaledTForPath)
+                //    context.Variables["T"] = eScaledT.Evaluate();
+                //var computedX = ePathX.Evaluate();
+                //var computedY = ePathY.Evaluate();
+                var finalT = progress;
                 if (useScaledTForPath)
-                    context.Variables["T"] = eScaledT.Evaluate();
-                var computedX = ePathX.Evaluate();
-                var computedY = ePathY.Evaluate();
+                    finalT = (float)eScaledT(progress);
+                var computedX = (float)ePathX(finalT);
+                var computedY = (float)ePathY(finalT);
                 return new Vector2(Mathf.LerpUnclamped(startPos.x, endPos.x, computedX), Mathf.LerpUnclamped(startPos.y, endPos.y, computedY));
             }
         }
@@ -305,11 +339,16 @@ namespace TSystem
             }
             else
             {
-                context.Variables["t"] = progress;
+                //context.Variables["t"] = progress;
+                //if (useScaledTForScale)
+                //    context.Variables["T"] = eScaledT.Evaluate();
+                //var computedX = eScaleX.Evaluate();
+                //var computedY = eScaleY.Evaluate();
+                var finalT = progress;
                 if (useScaledTForScale)
-                    context.Variables["T"] = eScaledT.Evaluate();
-                var computedX = eScaleX.Evaluate();
-                var computedY = eScaleY.Evaluate();
+                    finalT = (float)eScaledT(progress);
+                var computedX = (float)eScaleX(finalT);
+                var computedY = (float)eScaleY(finalT);
                 return new Vector2(computedX, computedY);
             }
         }
