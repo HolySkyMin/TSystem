@@ -63,12 +63,15 @@ namespace TSystem
             return JudgeType.NotJudged;
         }
 
-        public virtual void UpdateJudgeResult(int line, JudgeType result, bool flick, bool silent)
+        public virtual void UpdateJudgeResult(int line, JudgeType result, bool flick, bool silent, bool countJudge = true)
         {
-            if (!judgeResult.ContainsKey(result))
-                judgeResult.Add(result, 1);
-            else
-                judgeResult[result]++;
+            if(countJudge)
+            {
+                if (!judgeResult.ContainsKey(result))
+                    judgeResult.Add(result, 1);
+                else
+                    judgeResult[result]++;
+            }
 
             if(!silent)
             {

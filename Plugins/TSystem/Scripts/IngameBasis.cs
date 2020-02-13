@@ -190,8 +190,9 @@ namespace TSystem
 
                 foreach (var note in notes)
                 {
-                    if (note.Value.Progress >= 0 && !note.Value.isAppeared)
+                    if (note.Value.Progress >= -0.004f && !note.Value.isAppeared)
                     {
+                        note.Value.transform.SetAsFirstSibling();
                         note.Value.Wakeup();
                         if((int)note.Value.Type < 10 && note.Value.Type != NoteType.Hidden)
                             activedNotes.Add(note.Key);
