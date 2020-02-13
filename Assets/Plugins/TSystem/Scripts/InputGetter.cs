@@ -204,7 +204,10 @@ namespace TSystem
                             // Else, it's MISS.
                             Game.notes[line.holdingNote].isDead = true;
                             if (!Game.notes[line.holdingNote].nextNote.isAppeared)
+                            {
+                                Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false);
                                 Game.notes[line.holdingNote].Delete();
+                            }
                         }
                     }
                     else
@@ -212,7 +215,10 @@ namespace TSystem
                         // Else, it's MISS.
                         Game.notes[line.holdingNote].isDead = true;
                         if (!Game.notes[line.holdingNote].nextNote.isAppeared)
+                        {
+                            Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false);
                             Game.notes[line.holdingNote].Delete();
+                        }
                     }
                     line.isHolding = false;
                     line.touchingFinger = 100;
@@ -223,6 +229,7 @@ namespace TSystem
             {
                 if (slidingFinger.Contains(touch.fingerId) && touch.phase == TouchPhase.Ended)
                 {
+                    Game.judge.UpdateJudgeResult(0, JudgeType.Miss, false, false);
                     Game.notes[slidingNote[slidingFinger.IndexOf(touch.fingerId)]].isDead = true;
                     slidingNote.RemoveAt(slidingFinger.IndexOf(touch.fingerId));
                     slidingFinger.Remove(touch.fingerId);
