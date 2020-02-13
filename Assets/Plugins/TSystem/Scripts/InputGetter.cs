@@ -50,6 +50,8 @@ namespace TSystem
 
         void Update()
         {
+            if (!Game.IsStarted || Game.Paused || Game.IsEnded)
+                return;
             if (Game.IsAutoPlay)
                 return;
 
@@ -205,7 +207,7 @@ namespace TSystem
                             Game.notes[line.holdingNote].isDead = true;
                             if (!Game.notes[line.holdingNote].nextNote.isAppeared)
                             {
-                                Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false);
+                                Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false, false);
                                 Game.notes[line.holdingNote].Delete();
                             }
                         }
@@ -216,7 +218,7 @@ namespace TSystem
                         Game.notes[line.holdingNote].isDead = true;
                         if (!Game.notes[line.holdingNote].nextNote.isAppeared)
                         {
-                            Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false);
+                            Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false, false);
                             Game.notes[line.holdingNote].Delete();
                         }
                     }
@@ -229,7 +231,7 @@ namespace TSystem
             {
                 if (slidingFinger.Contains(touch.fingerId) && touch.phase == TouchPhase.Ended)
                 {
-                    Game.judge.UpdateJudgeResult(0, JudgeType.Miss, false, false);
+                    Game.judge.UpdateJudgeResult(0, JudgeType.Miss, false, false, false);
                     Game.notes[slidingNote[slidingFinger.IndexOf(touch.fingerId)]].isDead = true;
                     slidingNote.RemoveAt(slidingFinger.IndexOf(touch.fingerId));
                     slidingFinger.Remove(touch.fingerId);

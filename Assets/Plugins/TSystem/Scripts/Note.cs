@@ -159,10 +159,7 @@ namespace TSystem
                     {
                         isHit = true;
                         isDead = true;
-                        if (Type == NoteType.SlideMiddle)
-                            Judge(true, true);
-                        else
-                            Game.judge.noteQueue[EndLine].Remove(ID);
+                        Judge(true, true);
                         Delete();
                         return;
                     }
@@ -224,10 +221,12 @@ namespace TSystem
                     if (note.Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && note.isDead)
                     {
                         isDead = true;
-                        if (Type == NoteType.SlideMiddle)
-                            Game.judge.noteQueue[EndLine].Remove(ID);
                         Judge(true);
-                        Delete();
+                        if (Type == NoteType.SlideMiddle)
+                        {
+                            Game.judge.noteQueue[EndLine].Remove(ID);
+                            Delete();
+                        }
                     }
                     if (Type.IsEither(NoteType.SlideMiddle, NoteType.SlideEnd) && note.Type.IsEither(NoteType.SlideStart, NoteType.SlideMiddle))
                     {
@@ -236,9 +235,7 @@ namespace TSystem
                 }
             }
             if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
-            {
                 Delete();
-            }
         }
 
         protected virtual void Move()
