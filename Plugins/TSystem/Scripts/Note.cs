@@ -159,9 +159,12 @@ namespace TSystem
                     {
                         isHit = true;
                         isDead = true;
-                        Judge(true, true);
                         if (Type == NoteType.SlideMiddle)
-                            Delete();
+                            Judge(true, true);
+                        else
+                            Game.judge.noteQueue[EndLine].Remove(ID);
+                        Delete();
+                        return;
                     }
                 }
             }
@@ -223,7 +226,7 @@ namespace TSystem
                         isDead = true;
                         if (Type == NoteType.SlideMiddle)
                             Game.judge.noteQueue[EndLine].Remove(ID);
-                        Judge(true, true);
+                        Judge(true);
                         Delete();
                     }
                     if (Type.IsEither(NoteType.SlideMiddle, NoteType.SlideEnd) && note.Type.IsEither(NoteType.SlideStart, NoteType.SlideMiddle))
@@ -233,7 +236,9 @@ namespace TSystem
                 }
             }
             if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
+            {
                 Delete();
+            }
         }
 
         protected virtual void Move()
@@ -288,10 +293,16 @@ namespace TSystem
                         }
                     }
                     break;
+                case NoteType.Hidden:
+                    if (TimeDistance >= Game.Mode.judgeThreshold[1])
+                    {
+                        Game.judge.noteQueue[EndLine].Remove(ID);
+                        Delete();
+                    }
+                    break;
                 case NoteType.Starter:
                     if(Progress >= 1)
                     {
-                        // TODO: Start the game.
                         Game.StartPlayMusic();
                         Delete();
                     }
@@ -299,7 +310,6 @@ namespace TSystem
                 case NoteType.Ender:
                     if(Progress >= 1)
                     {
-                        // TODO: End the game
                         Game.EndGame();
                         Delete();
                     }
@@ -321,18 +331,6 @@ namespace TSystem
                 case NoteType.SlideDummy:
                     if (Game.notes[data.prevIds[0]].isHit || TimeDistance >= Game.Mode.judgeThreshold[5])
                         Delete();
-                    break;
-                default:
-                    if (Type == NoteType.Hidden && TimeDistance >= Game.Mode.judgeThreshold[1])
-                        Delete();
-                    if(!isHit && TimeDistance >= Game.Mode.judgeThreshold[5])   // So, when the note is not hit and reached the end...
-                    {
-                        Judge(true);
-                        if (Type == NoteType.HoldEnd)
-                            foreach (var note in previousNotes)
-                                if (note.Type == NoteType.HoldStart)
-                                    note.Delete();
-                    }
                     break;
             }
 
