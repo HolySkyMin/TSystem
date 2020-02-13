@@ -67,6 +67,7 @@ namespace TSystem
                 }
             }
 
+            slideGroupFinger = 100;
             lineSet = ls;
             hitTime = ReachTime;
             latestSlideJudge = JudgeType.NotJudged;
