@@ -8,8 +8,6 @@ namespace TSystem
     [RequireComponent(typeof(MeshFilter))]
     public class Tail : MonoBehaviour
     {
-        public static bool FixTailPosAtZero { get; set; }
-
         public IngameBasis Game { get { return IngameBasis.Now; } }
 
         [HideInInspector] public Color32 headColor;
@@ -20,6 +18,8 @@ namespace TSystem
         // MeshRenderer, MeshFilter는 GetComponent 로 해결
         public Material material;
         [Range(15, 50)] public int joints = 20;
+        [Header("Basis specific configs")]
+        public bool allowGradientTailMove = false;
 
         // 메쉬를 구성하는 필수 꼭짓점 데이터들
         protected int[] tris;
@@ -77,7 +77,7 @@ namespace TSystem
             var progressBetweenAppear = Mathf.Clamp01(Mathf.InverseLerp(headNote.appearTime, tailNote.appearTime, Game.Time));
             var progressBetweenReach = Mathf.Clamp01(Mathf.InverseLerp(Mathf.Min(headNote.hitTime, headNote.ReachTime), tailNote.ReachTime, Game.Time));
             var headPath = new Vector2(headNote.StartLine, Mathf.Lerp(headNote.EndLine, tailNote.EndLine, progressBetweenReach));
-            var tailPath = new Vector2(FixTailPosAtZero ? tailNote.StartLine : Mathf.Lerp(headNote.StartLine, tailNote.StartLine, progressBetweenAppear), tailNote.EndLine);
+            var tailPath = new Vector2(!allowGradientTailMove ? tailNote.StartLine : Mathf.Lerp(headNote.StartLine, tailNote.StartLine, progressBetweenAppear), tailNote.EndLine);
 
             for (int i = 0; i < joints; i++)
             {

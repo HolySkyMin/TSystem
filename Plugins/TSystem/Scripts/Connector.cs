@@ -8,12 +8,11 @@ namespace TSystem
     [RequireComponent(typeof(MeshFilter))]
     public class Connector : MonoBehaviour
     {
-        public static float DefaultTiltAngle { get; set; }
-        public static float HalfWidthCoeff { get; set; }
-
         public IngameBasis Game { get { return IngameBasis.Now; } }
 
         public Material material;
+        public float thicknessCoefficient = 0.5f;
+
         [HideInInspector] public Note headNote;
         [HideInInspector] public Note tailNote;
 
@@ -28,7 +27,7 @@ namespace TSystem
             headNote = h;
             tailNote = t;
 
-            halfWidth = Mathf.Min(headNote.halfTailWidth, tailNote.halfTailWidth) * HalfWidthCoeff;
+            halfWidth = Mathf.Min(headNote.halfTailWidth, tailNote.halfTailWidth) * thicknessCoefficient;
             tris = new[] { 0, 1, 2, 1, 2, 3 };
             columns = new Vector3[4];
             uvs = new[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1) };

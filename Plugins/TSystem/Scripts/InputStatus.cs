@@ -76,6 +76,11 @@ namespace TSystem
             holdingNote = holding;
         }
 
+        public bool IsFlickAvailable(FlickType flick)
+        {
+            return !flickHitted[flick];
+        }
+
         public void StartFlickCheck(int finger, FlickType flick, Vector2 startPos, Vector2 deltaPos)
         {
             touchingFinger = finger;
@@ -111,6 +116,30 @@ namespace TSystem
         public bool IsFlickEnough()
         {
             return flickMovedDistance >= IngameBasis.Now.flickThreshold;
+        }
+
+        public void SetFlickHit()
+        {
+            flickStarted = false;
+            touchingFinger = 100;
+            flickHitted[flickDirection] = true;
+            flickCooltime[flickDirection] = 0.05f;
+        }
+
+        public void UpdateCooltime()
+        {
+            foreach(var flickHitInfo in flickHitted)
+            {
+                if(flickHitInfo.Value == true)
+                {
+                    flickCooltime[flickHitInfo.Key] -= Time.deltaTime;
+                    if(flickCooltime[flickHitInfo.Key] <= 0)
+                    {
+                        flickCooltime[flickHitInfo.Key] = 0;
+                        flickHitted[flickHitInfo.Key] = false;
+                    }
+                }
+            }
         }
     }
 }

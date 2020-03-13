@@ -12,19 +12,21 @@ namespace TSystem.Example
         public string resourceMusicPath;
         public string resourceBGAPath;
         public string resourceBackImagePath;
+        public BeatmapType beatmapType;
         public bool allowAutoPlay;
         public bool disableBGA;
         public bool disableMusic;
         public bool enableMirror;
         public bool colorMyNote;
         public TextAsset modeFile;
-
+        [Header("TSystem one-pack object")]
         public GameObject tSystem;
+        [Header("Ingame manager objects")]
         public GameObject endText, fullComboText;
 
         bool isEndAnimated;
 
-        private void Start()
+        private void Awake()
         {
             isEndAnimated = false;
             StartTSystem();
@@ -45,7 +47,7 @@ namespace TSystem.Example
 
             TSystemStatic.ingamePacket = new IngamePacket()
             {
-                beatmap = new BeatmapData() { path = resourceBeatmapPath, type = BeatmapType.SSTrain },
+                beatmap = new BeatmapData() { path = resourceBeatmapPath, type = beatmapType },
                 musicPath = resourceMusicPath,
                 bgaPath = resourceBGAPath,
                 backImagePath = resourceBackImagePath,
