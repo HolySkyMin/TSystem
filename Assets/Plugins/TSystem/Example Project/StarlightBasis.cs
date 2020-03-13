@@ -11,8 +11,6 @@ namespace TSystem.Example
         {
             // TODO: Flexible flick threshold
             flickThreshold = 80;
-            Tail.FixTailPosAtZero = true;
-            Connector.HalfWidthCoeff = 0.5f;
             maxReachTime = 0;
 
             base.Awake();

@@ -22,6 +22,7 @@ namespace TSystem
         [HideInInspector] public int maxCombo = 0;
         [HideInInspector] public float percentage;
         [System.NonSerialized] public Dictionary<float, List<int>> noteQueue = new Dictionary<float, List<int>>();
+        [HideInInspector] public System.Action<JudgeType, bool> customJudgeAction;
 
         protected Dictionary<JudgeType, int> judgeResult = new Dictionary<JudgeType, int>();
 
@@ -93,6 +94,7 @@ namespace TSystem
                 }
                 judgeText.Show(result);
                 comboText.Show(comboCount);
+                customJudgeAction?.Invoke(result, flick);
             }
         }
 

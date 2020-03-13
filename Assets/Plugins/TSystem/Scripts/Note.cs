@@ -44,6 +44,8 @@ namespace TSystem
 
         public Image image;
         public Animator animator;
+        [Header("Basis specific configs")]
+        public bool allowHoldingScore = false;
 
         protected bool slideTransfered;
         protected NoteData data;
@@ -270,7 +272,14 @@ namespace TSystem
                     break;
                 case NoteType.SlideStart:
                     if (nextNote.Type == NoteType.SlideEnd && nextNote.Progress >= 1)
+                    {
+                        if (!isHit)
+                        {
+                            foreach (var line in Game.judge.noteQueue)
+                                line.Value.Remove(ID);
+                        }
                         Delete();
+                    }
                     break;
                 case NoteType.SlideMiddle:
                     if(Progress >= 1)
@@ -356,6 +365,19 @@ namespace TSystem
             {
                 if (Progress >= 1 && !isHit)
                     Judge();
+            }
+
+            if(Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && allowHoldingScore)
+            {
+                foreach(var touch in Input.touches)
+                {
+                    if(touch.fingerId == slideGroupFinger)
+                    {
+                        var pos = Game.GetTouchPos(touch.position);
+                        if (Vector2.Distance(pos, Body.anchoredPosition) <= halfJudgeWidth)
+                            Game.AddHoldingScore();
+                    }
+                }
             }
         }
 

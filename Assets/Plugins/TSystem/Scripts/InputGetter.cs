@@ -12,7 +12,7 @@ namespace TSystem
 
         [HideInInspector] public Dictionary<float, Vector2> lineEnd = new Dictionary<float, Vector2>();
         [HideInInspector] public Dictionary<float, InputStatus> lineInput = new Dictionary<float, InputStatus>();
-
+        
         List<Func<float, Vector2, bool>> isValidTouch;
         List<int> slidingFinger;
         List<int> slidingNote;
@@ -35,6 +35,8 @@ namespace TSystem
             foreach (var rule in rules)
                 isValidTouch.Add(rule);
         }
+
+        public bool IsValidTouch(float line, Vector2 pos) => isValidTouch[Game.Mode.judgeRule](line, pos);
 
         public void AddLine(float line)
         {
@@ -98,7 +100,7 @@ namespace TSystem
                     var target = line.GetTargetNote();
 
                     // If it's FLICK, start flick checking.
-                    if (!line.flickStarted && target.Flick != FlickType.NotFlick && touch.Value.phase.IsEither(TouchPhase.Stationary, TouchPhase.Moved))
+                    if (!line.flickStarted && target.Flick != FlickType.NotFlick && touch.Value.phase.IsEither(TouchPhase.Stationary, TouchPhase.Moved) && line.IsFlickAvailable(target.Flick))
                         line.StartFlickCheck(touch.Value.fingerId, target.Flick, pos, Game.GetTouchPos(touch.Value.deltaPosition));
                     else if(target.Flick == FlickType.NotFlick)
                     {
@@ -119,7 +121,10 @@ namespace TSystem
                                 {
                                     target.Judge();
                                     if (target.isHit && !target.isDead)
+                                    {
+                                        target.slideGroupFinger = touch.Value.fingerId;
                                         line.SetHold(touch.Value.fingerId, target.ID);
+                                    }
                                 }
                                 break;
                             case NoteType.SlideStart:
@@ -166,8 +171,7 @@ namespace TSystem
                         target.Judge();
                         if (target.isHit)
                         {
-                            line.flickStarted = false;
-                            line.touchingFinger = 100;
+                            line.SetFlickHit();
                             if (target.Type == NoteType.HoldEnd)
                                 line.isHolding = false;
                             if (target.Type == NoteType.SlideEnd)
@@ -203,7 +207,6 @@ namespace TSystem
                             target.Judge();
                         else
                         {
-                            // Else, it's MISS.
                             Game.notes[line.holdingNote].isDead = true;
                             if (!Game.notes[line.holdingNote].nextNote.isAppeared)
                             {
@@ -214,7 +217,6 @@ namespace TSystem
                     }
                     else
                     {
-                        // Else, it's MISS.
                         Game.notes[line.holdingNote].isDead = true;
                         if (!Game.notes[line.holdingNote].nextNote.isAppeared)
                         {
@@ -237,6 +239,9 @@ namespace TSystem
                     slidingFinger.Remove(touch.fingerId);
                 }
             }
+
+            foreach (var status in lineInput.Values)
+                status.UpdateCooltime();
         }
     }
 }

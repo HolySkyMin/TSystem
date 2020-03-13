@@ -13,8 +13,8 @@ namespace TSystem
         [HideInInspector] public Note leftNote;
         [HideInInspector] public Note rightNote;
 
-        public float halfWidthCoeff;
         public Material material;
+        public float thicknessCoefficient = 0.1f;
         [Range(2, 25)] public int joints = 2;
 
         protected int[] tris;
@@ -32,7 +32,7 @@ namespace TSystem
 
             // Assume that left / right note have same line set
             lineSet = leftNote.lineSet;
-            halfWidth = Mathf.Min(leftNote.halfTailWidth, rightNote.halfTailWidth) * halfWidthCoeff;
+            halfWidth = Mathf.Min(leftNote.halfTailWidth, rightNote.halfTailWidth) * thicknessCoefficient;
 
             InitializeVertexArrays();
         }

@@ -88,11 +88,11 @@ namespace TSystem
 
         public Vector2 GetStartPos(int set, float curLine)
         {
-            if (lineSet[set].count < 2)
+            if (lineSet[set].StartPosCount < 2)
                 return lineSet[set].StartPos(0);
             else
             {
-                if (curLine.IsBetween(1, lineSet[set].count, true, true))
+                if (curLine.IsBetween(1, lineSet[set].StartPosCount, true, true))
                 {
                     if (Mathf.Approximately(Mathf.Round(curLine - 1), curLine - 1))
                         return lineSet[set].StartPos(Mathf.RoundToInt(curLine - 1));
@@ -109,7 +109,7 @@ namespace TSystem
                     if (curLine < 1)
                         return Vector2.LerpUnclamped(lineSet[set].StartPos(0), lineSet[set].StartPos(1), curLine - 1);
                     else
-                        return Vector2.LerpUnclamped(lineSet[set].StartPos(lineSet[set].count - 2), lineSet[set].StartPos(lineSet[set].count - 1), curLine - lineSet[set].count + 1);
+                        return Vector2.LerpUnclamped(lineSet[set].StartPos(lineSet[set].StartPosCount - 2), lineSet[set].StartPos(lineSet[set].StartPosCount - 1), curLine - lineSet[set].StartPosCount + 1);
                 }
             }
         }
@@ -357,6 +357,8 @@ namespace TSystem
     [System.Serializable]
     public class TSModeLineData
     {
+        public int StartPosCount { get { return startPosX.Length; } }
+
         public int count;
         public double[] startPosX;
         public double[] startPosY;
