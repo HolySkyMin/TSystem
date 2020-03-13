@@ -1188,6 +1188,10 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 1e5dd87f0588c2d44b61fe9692b11d26, type: 2}
   joints: 20
   allowGradientTailMove: 0
+  forceDefaultTilt: 0
+  defaultColor:
+    serializedVersion: 2
+    rgba: 4294967295
 --- !u!23 &553861654
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2327,16 +2331,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c947b8c808299724393aa1546e3ee3ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceBeatmapPath: TSystem/sakura
+  resourceBeatmapPath: TSystem/fiesta
   resourceMusicPath: TSystem/sake
   resourceBGAPath: 
   resourceBackImagePath: 
-  beatmapType: 2
-  allowAutoPlay: 0
+  beatmapType: 0
+  allowAutoPlay: 1
   disableBGA: 1
-  disableMusic: 0
+  disableMusic: 1
   enableMirror: 0
-  colorMyNote: 0
+  colorMyNote: 1
   modeFile: {fileID: 4900000, guid: 68d584b39a5110c4a99b4d8e1009f90e, type: 3}
   tSystem: {fileID: 2139799184}
   endText: {fileID: 1820286944}
@@ -4663,6 +4667,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 1e5dd87f0588c2d44b61fe9692b11d26, type: 2}
   thicknessCoefficient: 0.5
+  defaultColor:
+    serializedVersion: 2
+    rgba: 4294967295
   headNote: {fileID: 0}
   tailNote: {fileID: 0}
 --- !u!23 &1815453032

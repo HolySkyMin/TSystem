@@ -128,15 +128,15 @@ namespace TSystem
 
         public void UpdateCooltime()
         {
-            foreach(var flickHitInfo in flickHitted)
+            for(int i = 1; i <= 5; i++)
             {
-                if(flickHitInfo.Value == true)
+                if (flickHitted[(FlickType)i] == true)
                 {
-                    flickCooltime[flickHitInfo.Key] -= Time.deltaTime;
-                    if(flickCooltime[flickHitInfo.Key] <= 0)
+                    flickCooltime[(FlickType)i] -= Time.deltaTime;
+                    if (flickCooltime[(FlickType)i] <= 0)
                     {
-                        flickCooltime[flickHitInfo.Key] = 0;
-                        flickHitted[flickHitInfo.Key] = false;
+                        flickCooltime[(FlickType)i] = 0;
+                        flickHitted[(FlickType)i] = false;
                     }
                 }
             }
