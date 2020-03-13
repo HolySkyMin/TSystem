@@ -41,6 +41,9 @@ namespace TSystem
             halfWidth = Mathf.Min(headNote.halfTailWidth, tailNote.halfTailWidth);
 
             InitializeVertexArrays();
+
+            if (TSystemConfig.Now.colorNote)
+                GetComponent<MeshRenderer>().material.color = headNote.ColorKey;
         }
 
         /// <summary>

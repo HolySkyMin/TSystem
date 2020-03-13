@@ -31,6 +31,9 @@ namespace TSystem
             tris = new[] { 0, 1, 2, 1, 2, 3 };
             columns = new Vector3[4];
             uvs = new[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1) };
+
+            if(TSystemConfig.Now.colorNote)
+                GetComponent<MeshRenderer>().material.color = headNote.ColorKey;
         }
 
         void Start()
