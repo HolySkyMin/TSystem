@@ -328,6 +328,20 @@ namespace TSystem
                         Delete();
                     }
                     break;
+                case NoteType.SpecialEnterer:
+                    if(Progress > 1)
+                    {
+                        Game.TriggerSpecialEnter();
+                        Delete();
+                    }
+                    break;
+                case NoteType.SpecialLeaver:
+                    if(Progress > 1)
+                    {
+                        Game.TriggerSpecialLeave();
+                        Delete();
+                    }
+                    break;
                 case NoteType.LineChanger:
                     if(Progress >= 1)
                     {

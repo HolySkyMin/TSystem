@@ -260,7 +260,7 @@ namespace TSystem
             if (useBezierPath)
             {
                 Vector2 res = Vector2.zero;
-                var n = bezierPathX.Length;
+                var n = bezierPathX.Length - 1;
                 for (int i = 0; i <= n; i++)
                 {
                     res += new Vector2(
@@ -291,7 +291,7 @@ namespace TSystem
             if (useBezierPath)
             {
                 Vector2 res = Vector2.zero;
-                var n = bezierPathX.Length;
+                var n = bezierPathX.Length - 1;
                 for (int i = 0; i <= n; i++)
                 {
                     res += new Vector2(
