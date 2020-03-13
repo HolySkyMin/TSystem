@@ -21,6 +21,7 @@ namespace TSystem
         [Header("Basis specific configs")]
         public bool allowGradientTailMove = false;
         public bool forceDefaultTilt = false;
+        public Color32 defaultColor = Color.white;
 
         // 메쉬를 구성하는 필수 꼭짓점 데이터들
         protected int[] tris;
@@ -31,6 +32,7 @@ namespace TSystem
         // 데이터들
         float headTime = 0, tailTime = 0, halfWidth;
         bool allowFlexibleTilt;
+        Color[] colorArray;
 
         public void Set(Note h, Note t, bool flexible)
         {
@@ -41,9 +43,6 @@ namespace TSystem
             halfWidth = Mathf.Min(headNote.halfTailWidth, tailNote.halfTailWidth);
 
             InitializeVertexArrays();
-
-            if (TSystemConfig.Now.colorNote)
-                GetComponent<MeshRenderer>().material.color = headNote.ColorKey;
         }
 
         /// <summary>
@@ -62,6 +61,10 @@ namespace TSystem
                 tris[j + 1] = i + 1;
                 tris[j + 2] = i + 2;
             }
+
+            colorArray = new Color[uvs.Length];
+            for (int i = 0; i < colorArray.Length; i++)
+                colorArray[i] = TSystemConfig.Now.colorNote ? headNote.ColorKey : defaultColor;
         }
 
         private void Start()
@@ -114,6 +117,7 @@ namespace TSystem
             mesh.vertices = columns;
             mesh.uv = uvs;
             mesh.triangles = tris;
+            mesh.colors = colorArray;
         }
     }
 }
