@@ -20,6 +20,7 @@ namespace TSystem
         [Range(15, 50)] public int joints = 20;
         [Header("Basis specific configs")]
         public bool allowGradientTailMove = false;
+        public bool forceDefaultTilt = false;
 
         // 메쉬를 구성하는 필수 꼭짓점 데이터들
         protected int[] tris;
@@ -35,7 +36,7 @@ namespace TSystem
         {
             headNote = h;
             tailNote = t;
-            allowFlexibleTilt = flexible;
+            allowFlexibleTilt = forceDefaultTilt ? false : flexible;
 
             halfWidth = Mathf.Min(headNote.halfTailWidth, tailNote.halfTailWidth);
 
