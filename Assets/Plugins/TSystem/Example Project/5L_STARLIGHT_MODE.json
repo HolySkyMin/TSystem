@@ -27,11 +27,18 @@
     "judgeHFSThreshold": [0.016, 0.09, 0.12, 0.15, 0.18, 0.25],
 
     "useScaledTForPath": true,
-    "useScaledTForScale": false,
+    "useKeyframeScale": true,
     "scaledT": "2*t/(t+1)",
 
     "pathX": "T",
     "pathY": "((-800)*T*(1-T)+390*T)/390",
-    "scaleX": "t",
-    "scaleY": "t"
+    "keyframeScale":
+    [
+        {
+            "connectMethod": 0,
+            "range": [0, 0.25, 1],
+            "posX": [0, 0.3, 1],
+            "posY": [0, 0.3, 1]
+        }
+    ]
 }

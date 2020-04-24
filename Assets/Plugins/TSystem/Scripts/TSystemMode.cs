@@ -28,8 +28,8 @@ namespace TSystem
         public double[] judgeHFSThreshold;// Threshold value of note (Hold/Flick/Slide) judging
 
         // Note paths and scales
-        public bool useBezierPath;      // Will you use bezier algorithm for note path computing?
-        public bool useBezierScale;     // Will you use bezier algorithm for note scale computing?
+        public bool useKeyframePath;    // Will you use keyframes for note path computing?
+        public bool useKeyframeScale;   // Will you use keyframes for note scale computing?
         public bool useScaledTForPath;
         public bool useScaledTForScale;
 
@@ -39,29 +39,13 @@ namespace TSystem
         public string scaleX;           // Arithmatic expression for X value of note scale
         public string scaleY;           // Arithmatic expression for Y value of note scale
 
-        public double[] bezierPathX;     // X value of Bezier control points for note path
-        public double[] bezierPathY;     // Y value of Bezier control points for note path
-        public double[] bezierScaleX;    // X value of Bezier control points for note scale
-        public double[] bezierScaleY;    // Y value of Bezier control points for note scale
+        public TSModeKeyframeArea[] keyframePath;
+        public TSModeKeyframeArea[] keyframeScale;
 
-        //ExpressionContext context;
-        //IGenericExpression<float> eScaledT, ePathX, ePathY, eScaleX, eScaleY;
         ExpressionDelegate eScaledT, ePathX, ePathY, eScaleX, eScaleY;
 
         public void SetArguments()
         {
-            //context = new ExpressionContext();
-            //context.Imports.AddType(typeof(System.Math));
-
-            //// Context value reset
-            //context.Variables["t"] = 0.0f;
-            //context.Variables["T"] = 0.0f;
-            //eScaledT = context.CompileGeneric<float>(scaledT);
-            //ePathX = context.CompileGeneric<float>(pathX);
-            //ePathY = context.CompileGeneric<float>(pathY);
-            //eScaleX = context.CompileGeneric<float>(scaleX);
-            //eScaleY = context.CompileGeneric<float>(scaleY);
-
             var parser = new ExpressionParser();
 
             if (useScaledTForPath || useScaledTForScale)
@@ -70,14 +54,14 @@ namespace TSystem
                 _ = eScaledT(0);
             }
 
-            if (!useBezierPath)
+            if (!useKeyframePath)
             {
                 ePathX = parser.EvaluateExpression(pathX).ToDelegate(useScaledTForPath ? "T" : "t");
                 ePathY = parser.EvaluateExpression(pathY).ToDelegate(useScaledTForPath ? "T" : "t");
                 _ = ePathX(0);
                 _ = ePathY(0);
             }
-            if(!useBezierScale)
+            if(!useKeyframeScale)
             {
                 eScaleX = parser.EvaluateExpression(scaleX).ToDelegate(useScaledTForScale ? "T" : "t");
                 eScaleY = parser.EvaluateExpression(scaleY).ToDelegate(useScaledTForScale ? "T" : "t");
@@ -257,25 +241,26 @@ namespace TSystem
             Vector2 start = GetStartPos(set, startLine), end = GetEndPos(set, endLine);
 
             progress = Mathf.Max(progress, 0);
-            if (useBezierPath)
+            if (useKeyframePath)
             {
-                Vector2 res = Vector2.zero;
-                var n = bezierPathX.Length - 1;
-                for (int i = 0; i <= n; i++)
+                var coeff = (0f, 0f);
+                if (progress < 0)
+                    coeff = keyframePath[0].GetPosCoeff(progress);
+                else if (progress > 1)
+                    coeff = keyframePath[keyframePath.Length - 1].GetPosCoeff(progress);
+                else
                 {
-                    res += new Vector2(
-                        (float)bezierPathX[i] * Mathf.Pow(1 - progress, n - i) * Mathf.Pow(progress, i),
-                        (float)bezierPathY[i] * Mathf.Pow(1 - progress, n - i) * Mathf.Pow(progress, i));
+                    for (int i = 0; i < keyframePath.Length; i++)
+                    {
+                        if (progress.IsBetween(keyframePath[i].AreaRange.x, keyframePath[i].AreaRange.y, true, true))
+                            coeff = keyframePath[i].GetPosCoeff(progress);
+                        break;
+                    }
                 }
-                return new Vector2(Mathf.LerpUnclamped(start.x, end.x, res.x), Mathf.LerpUnclamped(start.y, end.y, res.y));
+                return new Vector2(Mathf.LerpUnclamped(start.x, end.x, coeff.Item1), Mathf.LerpUnclamped(start.y, end.y, coeff.Item2));
             }
             else
             {
-                //context.Variables["t"] = progress;
-                //if (useScaledTForPath)
-                //    context.Variables["T"] = eScaledT.Evaluate();
-                //var computedX = ePathX.Evaluate();
-                //var computedY = ePathY.Evaluate();
                 var finalT = progress;
                 if (useScaledTForPath)
                     finalT = (float)eScaledT(progress);
@@ -288,25 +273,26 @@ namespace TSystem
         public Vector2 GetCurrentPos(float progress, Vector2 startPos, Vector2 endPos)
         {
             progress = Mathf.Max(progress, 0);
-            if (useBezierPath)
+            if (useKeyframePath)
             {
-                Vector2 res = Vector2.zero;
-                var n = bezierPathX.Length - 1;
-                for (int i = 0; i <= n; i++)
+                var coeff = (0f, 0f);
+                if (progress < 0)
+                    coeff = keyframePath[0].GetPosCoeff(progress);
+                else if (progress > 1)
+                    coeff = keyframePath[keyframePath.Length - 1].GetPosCoeff(progress);
+                else
                 {
-                    res += new Vector2(
-                        (float)bezierPathX[i] * Mathf.Pow(1 - progress, n - i) * Mathf.Pow(progress, i),
-                        (float)bezierPathY[i] * Mathf.Pow(1 - progress, n - i) * Mathf.Pow(progress, i));
+                    for (int i = 0; i < keyframePath.Length; i++)
+                    {
+                        if (progress.IsBetween(keyframePath[i].AreaRange.x, keyframePath[i].AreaRange.y, true, true))
+                            coeff = keyframePath[i].GetPosCoeff(progress);
+                        break;
+                    }
                 }
-                return new Vector2(Mathf.LerpUnclamped(startPos.x, endPos.x, res.x), Mathf.LerpUnclamped(startPos.y, endPos.y, res.y));
+                return new Vector2(Mathf.LerpUnclamped(startPos.x, endPos.x, coeff.Item1), Mathf.LerpUnclamped(startPos.y, endPos.y, coeff.Item2));
             }
             else
             {
-                //context.Variables["t"] = progress;
-                //if (useScaledTForPath)
-                //    context.Variables["T"] = eScaledT.Evaluate();
-                //var computedX = ePathX.Evaluate();
-                //var computedY = ePathY.Evaluate();
                 var finalT = progress;
                 if (useScaledTForPath)
                     finalT = (float)eScaledT(progress);
@@ -325,25 +311,26 @@ namespace TSystem
         public Vector2 GetScale(float progress)
         {
             progress = Mathf.Max(progress, 0);
-            if (useBezierScale)
+            if (useKeyframeScale)
             {
-                Vector2 res = Vector2.zero;
-                var n = bezierPathX.Length;
-                for (int i = 0; i <= n; i++)
+                var coeff = (0f, 0f);
+                if (progress < 0)
+                    coeff = keyframeScale[0].GetPosCoeff(progress);
+                else if (progress > 1)
+                    coeff = keyframeScale[keyframeScale.Length - 1].GetPosCoeff(progress);
+                else
                 {
-                    res += new Vector2(
-                        (float)bezierScaleX[i] * Mathf.Pow(1 - progress, n - i) * Mathf.Pow(progress, i),
-                        (float)bezierScaleY[i] * Mathf.Pow(1 - progress, n - i) * Mathf.Pow(progress, i));
+                    for (int i = 0; i < keyframeScale.Length; i++)
+                    {
+                        if (progress.IsBetween(keyframeScale[i].AreaRange.x, keyframeScale[i].AreaRange.y, true, true))
+                            coeff = keyframeScale[i].GetPosCoeff(progress);
+                        break;
+                    }
                 }
-                return res;
+                return new Vector2(coeff.Item1, coeff.Item2);
             }
             else
             {
-                //context.Variables["t"] = progress;
-                //if (useScaledTForScale)
-                //    context.Variables["T"] = eScaledT.Evaluate();
-                //var computedX = eScaleX.Evaluate();
-                //var computedY = eScaleY.Evaluate();
                 var finalT = progress;
                 if (useScaledTForScale)
                     finalT = (float)eScaledT(progress);
@@ -379,11 +366,74 @@ namespace TSystem
     }
 
     [System.Serializable]
-    public class TSModePathData
+    public class TSModeKeyframeArea
     {
-        public int method;
-        public bool useScaledT;
-        public double[] controlKeyT;
-        public double[] controlKeyF;
+        public Vector2 AreaRange { get { return new Vector2((float)range[0], (float)range[range.Length - 1]); } }
+
+        public int connectMethod; // 0: Linear, 1: Bezier curve
+        public double[] range; // Range between 0 and 1
+        public double[] posX;
+        public double[] posY;
+
+        public (float, float) GetPosCoeff(float t)
+        {
+            var div = (t - AreaRange.x) / (AreaRange.y - AreaRange.x);
+            
+            switch(connectMethod)
+            {
+                case 0:
+                    return GetLinearPosCoeff(div);
+                case 1:
+                    return GetBezierPosCoeff(div);
+                default:
+                    return (t, t);
+            }
+        }
+
+        (float, float) GetLinearPosCoeff(float d)
+        {
+            if (d < 0)
+                return (Mathf.LerpUnclamped((float)posX[0], (float)posX[1], d), Mathf.LerpUnclamped((float)posY[0], (float)posY[1], d));
+            else if (d > 1)
+            {
+                return (Mathf.LerpUnclamped((float)posX[posX.Length - 2], (float)posX[posX.Length - 1], d),
+                    Mathf.LerpUnclamped((float)posY[posY.Length - 2], (float)posY[posY.Length - 1], d));
+            }
+            else
+            {
+                for (int i = 0; i < range.Length - 1; i++)
+                {
+                    if (d.IsBetween((float)range[i], (float)range[i + 1], true, true))
+                    {
+                        var div = Mathf.InverseLerp((float)range[i], (float)range[i + 1], d);
+                        return (Mathf.Lerp((float)posX[i], (float)posX[i + 1], div), Mathf.Lerp((float)posY[i], (float)posY[i + 1], div));
+                    }
+                }
+                return (0, 0);
+            }
+        }
+
+        (float, float) GetBezierPosCoeff(float d)
+        {
+            if (d < 0)
+                return (Mathf.LerpUnclamped((float)posX[0], (float)posX[1], d), Mathf.LerpUnclamped((float)posY[0], (float)posY[1], d));
+            else if (d > 1)
+            {
+                return (Mathf.LerpUnclamped((float)posX[posX.Length - 2], (float)posX[posX.Length - 1], d),
+                    Mathf.LerpUnclamped((float)posY[posY.Length - 2], (float)posY[posY.Length - 1], d));
+            }
+            else
+            {
+                var res = Vector2.zero;
+                var n = posX.Length - 1;
+                for (int i = 0; i <= n; i++)
+                {
+                    res += new Vector2(
+                        (float)posX[i] * Mathf.Pow(1 - d, n - i) * Mathf.Pow(d, i),
+                        (float)posY[i] * Mathf.Pow(1 - d, n - i) * Mathf.Pow(d, i));
+                }
+                return (res.x, res.y);
+            }
+        }
     }
 }
