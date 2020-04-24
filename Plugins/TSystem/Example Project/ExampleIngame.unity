@@ -2331,11 +2331,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c947b8c808299724393aa1546e3ee3ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceBeatmapPath: TSystem/fiesta
+  resourceBeatmapPath: TSystem/sakura
   resourceMusicPath: TSystem/sake
   resourceBGAPath: 
   resourceBackImagePath: 
-  beatmapType: 0
+  beatmapType: 2
   allowAutoPlay: 1
   disableBGA: 1
   disableMusic: 1
