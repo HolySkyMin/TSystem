@@ -253,8 +253,10 @@ namespace TSystem
                     for (int i = 0; i < keyframePath.Length; i++)
                     {
                         if (progress.IsBetween(keyframePath[i].AreaRange.x, keyframePath[i].AreaRange.y, true, true))
+                        {
                             coeff = keyframePath[i].GetPosCoeff(progress);
-                        break;
+                            break;
+                        }
                     }
                 }
                 return new Vector2(Mathf.LerpUnclamped(start.x, end.x, coeff.Item1), Mathf.LerpUnclamped(start.y, end.y, coeff.Item2));
@@ -285,8 +287,10 @@ namespace TSystem
                     for (int i = 0; i < keyframePath.Length; i++)
                     {
                         if (progress.IsBetween(keyframePath[i].AreaRange.x, keyframePath[i].AreaRange.y, true, true))
+                        {
                             coeff = keyframePath[i].GetPosCoeff(progress);
-                        break;
+                            break;
+                        }
                     }
                 }
                 return new Vector2(Mathf.LerpUnclamped(startPos.x, endPos.x, coeff.Item1), Mathf.LerpUnclamped(startPos.y, endPos.y, coeff.Item2));
@@ -323,8 +327,10 @@ namespace TSystem
                     for (int i = 0; i < keyframeScale.Length; i++)
                     {
                         if (progress.IsBetween(keyframeScale[i].AreaRange.x, keyframeScale[i].AreaRange.y, true, true))
+                        {
                             coeff = keyframeScale[i].GetPosCoeff(progress);
-                        break;
+                            break;
+                        }
                     }
                 }
                 return new Vector2(coeff.Item1, coeff.Item2);
