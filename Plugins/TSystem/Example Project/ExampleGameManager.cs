@@ -36,7 +36,7 @@ namespace TSystem.Example
         {
             TSystemConfig.Now = new TSystemConfig()
             {
-                noteSpeed = 1,
+                noteSpeed = 0.5f,
                 gameSync = 0,
                 allowSoundEffect = true,
                 colorNote = colorMyNote,
