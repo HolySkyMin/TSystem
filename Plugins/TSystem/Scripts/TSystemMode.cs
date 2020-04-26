@@ -165,11 +165,11 @@ namespace TSystem
             var floored = Mathf.FloorToInt(curLine - 1);
             var ceiled = Mathf.CeilToInt(curLine - 1);
 
-            if (lineSet[set].count < 2)
+            if (lineSet[set].startPosTilt.Length < 2)
                 return (float)lineSet[set].startPosTilt[0];
             else
             {
-                if (curLine.IsBetween(1, lineSet[set].count, true, true))
+                if (curLine.IsBetween(1, lineSet[set].startPosTilt.Length, true, true))
                 {
                     var t = Mathf.InverseLerp(floored, ceiled, curLine - 1);
                     return Mathf.Lerp((float)lineSet[set].startPosTilt[floored], (float)lineSet[set].startPosTilt[ceiled], t);
@@ -179,7 +179,7 @@ namespace TSystem
                     if (curLine < 1)
                         return Mathf.LerpUnclamped((float)lineSet[set].startPosTilt[0], (float)lineSet[set].startPosTilt[1], curLine - 1);
                     else
-                        return Mathf.LerpUnclamped((float)lineSet[set].startPosTilt[lineSet[set].count - 2], (float)lineSet[set].startPosTilt[lineSet[set].count - 1], curLine - lineSet[set].count + 1);
+                        return Mathf.LerpUnclamped((float)lineSet[set].startPosTilt[lineSet[set].count - 2], (float)lineSet[set].startPosTilt[lineSet[set].count - 1], curLine - lineSet[set].startPosTilt.Length + 1);
                 }
             }
         }
