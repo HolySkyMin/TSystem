@@ -220,7 +220,7 @@ namespace TSystem
                         Blocks[CurBlock].DataLines.Add(dataLine);
                         Blocks[CurBlock].Channel.Add(int.Parse(data[0].Substring(1)));
                         Blocks[CurBlock].Color.Add(Color);
-                        Blocks[CurBlock].Speed.Add(Speed * Game.FixedNoteSpeed);
+                        Blocks[CurBlock].Speed.Add(Speed);
 
                         if (MaxBlockNum < CurBlock) { MaxBlockNum = CurBlock; }
                     }
@@ -238,7 +238,7 @@ namespace TSystem
             file.Close();
 
             // Creates note at here.
-            Game.CreateNote(new NoteData(0, 0, SongTime, (float)Speed * Game.FixedNoteSpeed, 0, 0, NoteType.Starter, FlickType.NotFlick, new Color32(255, 255, 255, 255), new List<int>()));
+            Game.CreateNote(new NoteData(0, 0, SongTime, (float)Speed, 0, 0, NoteType.Starter, FlickType.NotFlick, new Color32(255, 255, 255, 255), new List<int>()));
             for (int i = 0; i <= MaxBlockNum; i++)
             {
                 if (Blocks.ContainsKey(i))

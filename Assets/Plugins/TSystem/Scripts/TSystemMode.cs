@@ -421,25 +421,15 @@ namespace TSystem
 
         (float, float) GetBezierPosCoeff(float d)
         {
-            if (d < 0)
-                return (Mathf.LerpUnclamped((float)posX[0], (float)posX[1], d), Mathf.LerpUnclamped((float)posY[0], (float)posY[1], d));
-            else if (d > 1)
+            var res = Vector2.zero;
+            var n = posX.Length - 1;
+            for (int i = 0; i <= n; i++)
             {
-                return (Mathf.LerpUnclamped((float)posX[posX.Length - 2], (float)posX[posX.Length - 1], d),
-                    Mathf.LerpUnclamped((float)posY[posY.Length - 2], (float)posY[posY.Length - 1], d));
+                res += new Vector2(
+                    (float)posX[i] * Mathf.Pow(1 - d, n - i) * Mathf.Pow(d, i),
+                    (float)posY[i] * Mathf.Pow(1 - d, n - i) * Mathf.Pow(d, i));
             }
-            else
-            {
-                var res = Vector2.zero;
-                var n = posX.Length - 1;
-                for (int i = 0; i <= n; i++)
-                {
-                    res += new Vector2(
-                        (float)posX[i] * Mathf.Pow(1 - d, n - i) * Mathf.Pow(d, i),
-                        (float)posY[i] * Mathf.Pow(1 - d, n - i) * Mathf.Pow(d, i));
-                }
-                return (res.x, res.y);
-            }
+            return (res.x, res.y);
         }
     }
 }

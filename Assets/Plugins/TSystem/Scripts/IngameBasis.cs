@@ -72,7 +72,7 @@ namespace TSystem
         {
             Now = this;
 
-            Time = GameSync - FixedNoteSpeed;
+            Time = GameSync - (1f / FixedNoteSpeed);
             FixedTime = Time;
             TimeSpeed = 1;
             NoteSpeed = FixedNoteSpeed;
