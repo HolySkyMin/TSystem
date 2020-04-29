@@ -52,6 +52,9 @@ namespace TSystem
 
         void Update()
         {
+            foreach (var line in lineInput)
+                line.Value.tapHitted = false;
+
             if (!Game.IsStarted || Game.Paused || Game.IsEnded)
                 return;
             if (Game.IsAutoPlay)
@@ -108,15 +111,21 @@ namespace TSystem
                         {
                             case NoteType.Tap:
                             case NoteType.Hidden:
-                                if (touch.Value.phase == TouchPhase.Began)
+                                if (touch.Value.phase == TouchPhase.Began && !line.tapHitted)
+                                {
                                     target.Judge();
+                                    line.tapHitted = true;
+                                }
                                 break;
                             case NoteType.Damage:
-                                if (touch.Value.phase == TouchPhase.Began)
+                                if (touch.Value.phase == TouchPhase.Began && !line.tapHitted)
+                                {
                                     target.Judge(true);
+                                    line.tapHitted = true;
+                                }
                                 break;
                             case NoteType.HoldStart:
-                                if (touch.Value.phase == TouchPhase.Began)
+                                if (touch.Value.phase == TouchPhase.Began && !line.tapHitted)
                                 {
                                     target.Judge();
                                     if (target.isHit && !target.isDead)
@@ -124,10 +133,11 @@ namespace TSystem
                                         target.slideGroupFinger = touch.Value.fingerId;
                                         line.SetHold(touch.Value.fingerId, target.ID);
                                     }
+                                    line.tapHitted = true;
                                 }
                                 break;
                             case NoteType.SlideStart:
-                                if (touch.Value.phase == TouchPhase.Began)
+                                if (touch.Value.phase == TouchPhase.Began && !line.tapHitted)
                                 {
                                     target.Judge();
                                     if (target.isHit && !target.isDead)
@@ -136,6 +146,7 @@ namespace TSystem
                                         slidingNote.Add(target.ID);
                                         target.slideGroupFinger = touch.Value.fingerId;
                                     }
+                                    line.tapHitted = true;
                                 }
                                 break;
                             case NoteType.SlideMiddle:
