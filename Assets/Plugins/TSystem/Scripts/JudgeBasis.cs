@@ -37,6 +37,21 @@ namespace TSystem
             percenText.text = percentage.ToString("N2") + "%";
         }
 
+        private void LateUpdate()
+        {
+            // Check if already-dead notes are existing on first part of queue
+            foreach (var queue in noteQueue)
+            {
+                while (queue.Value.Count > 0)
+                {
+                    if (Game.notes[queue.Value[0]].isHit || Game.notes[queue.Value[0]].isDead)
+                        queue.Value.RemoveAt(0);
+                    else
+                        break;
+                }
+            }
+        }
+
         public virtual JudgeType GetJudge(float line, NoteType type, FlickType flick, float deltaTime)
         {
             deltaTime = Mathf.Abs(deltaTime);

@@ -31,6 +31,8 @@ namespace TSystem
             if (path == "")
                 return;
 
+            videoPlayer.audioOutputMode = TSystemConfig.Now.enableBgaMusic ? VideoAudioOutputMode.Direct : VideoAudioOutputMode.None;
+
             if(Game.Packet.loadFromResources)
             {
                 videoPlayer.source = VideoSource.VideoClip;
