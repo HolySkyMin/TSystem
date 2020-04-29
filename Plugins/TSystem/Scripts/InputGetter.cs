@@ -68,8 +68,7 @@ namespace TSystem
                 foreach (var line in lineEnd)
                 {
                     if (isValidTouch[Game.Mode.judgeRule](line.Key, pos))
-                        if(!normalTouch.ContainsKey(line.Key))
-                            normalTouch.Add(line.Key, touch);
+                        normalTouch.Add(line.Key, touch);
                     if(lineInput[line.Key].touchingFinger == touch.fingerId)
                     {
                         if (lineInput[line.Key].isHolding)

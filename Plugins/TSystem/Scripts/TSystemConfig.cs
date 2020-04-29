@@ -17,6 +17,7 @@ namespace TSystem
         public float effectVolume; // 사운드 이펙트의 볼륨 값입니다.
         public bool allowSoundEffect; // 사운드 이펙트 재생을 허용할지에 대한 값입니다.
         public bool colorNote; // 게임에서 노트 색깔을 적용할지에 대한 값입니다.
+        public bool enableBgaMusic;
 
         public TSystemConfig()
         {
@@ -27,6 +28,7 @@ namespace TSystem
             effectVolume = 1;
             allowSoundEffect = true;
             colorNote = false;
+            enableBgaMusic = false;
         }
 
         public static void Load()

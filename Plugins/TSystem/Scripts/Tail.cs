@@ -45,9 +45,6 @@ namespace TSystem
             InitializeVertexArrays();
         }
 
-        /// <summary>
-        /// Initializes 'joint, columns, uvs, tris' array based on Joints value.
-        /// </summary>
         public void InitializeVertexArrays()
         {
             joint = new Vector3[joints];
@@ -76,7 +73,7 @@ namespace TSystem
             GetComponent<MeshRenderer>().sortingLayerName = "Meshes";
         }
 
-        private void LateUpdate()
+        public virtual void LateUpdate()
         {
             headTime = Mathf.Clamp01(headNote.Progress);
             tailTime = Mathf.Clamp01(tailNote.Progress);
@@ -86,14 +83,21 @@ namespace TSystem
             var headPath = new Vector2(headNote.StartLine, Mathf.Lerp(headNote.EndLine, tailNote.EndLine, progressBetweenReach));
             var tailPath = new Vector2(!allowGradientTailMove ? tailNote.StartLine : Mathf.Lerp(headNote.StartLine, tailNote.StartLine, progressBetweenAppear), tailNote.EndLine);
 
-            for (int i = 0; i < joints; i++)
+            // Complete calculating joints first
+            for(int i = 0; i < joints; i++)
             {
                 var localProgress = Mathf.Lerp(tailTime, headTime, i / (float)(joints - 1));
                 var localPathPos = Vector2.Lerp(tailPath, headPath, i / (float)(joints - 1));
                 var localLineSet = Mathf.Lerp(tailNote.lineSet, headNote.lineSet, i / (float)(joints - 1));
                 joint[i] = Game.Mode.GetCurrentPos(localLineSet, localProgress, localPathPos.x, localPathPos.y);
-                //Debug.Log(gameObject.name + " [" + i + "] : joint = " + joint[i]);
+            }
 
+            // Then calculate tilt angle and columns
+            for (int i = 0; i < joints; i++)
+            {
+                var localProgress = Mathf.Lerp(tailTime, headTime, i / (float)(joints - 1));
+                var localPathPos = Vector2.Lerp(tailPath, headPath, i / (float)(joints - 1));
+                var localLineSet = Mathf.Lerp(tailNote.lineSet, headNote.lineSet, i / (float)(joints - 1));
                 var localTiltAngle = Game.Mode.GetCurrentTiltDegree(localLineSet, localProgress, localPathPos.x, localPathPos.y);
                 var localScale = Game.Mode.GetScale(localProgress);
                 var armDir = new Vector2(Mathf.Cos(localTiltAngle * Mathf.Deg2Rad), Mathf.Sin(localTiltAngle * Mathf.Deg2Rad));
@@ -105,12 +109,12 @@ namespace TSystem
                 var magnitude = halfWidth * Mathf.Sqrt(
                     Mathf.Pow(localScale.x * Mathf.Cos(Vector2.SignedAngle(Vector2.right, armDir)), 2) +
                     Mathf.Pow(localScale.y * Mathf.Sin(Vector2.SignedAngle(Vector2.right, armDir)), 2));
-                //Debug.Log(gameObject.name + " [" + i + "] : dir = " + armDir + ", mag = " + magnitude);
+                //Debug.Log(gameObject.name + " [" + i + "] (Progress: " + localProgress + ") : dir = " + armDir + ", mag = " + magnitude);
                 columns[2 * i] = joint[i] + (Vector3)(armDir * magnitude);
                 columns[2 * i + 1] = joint[i] - (Vector3)(armDir * magnitude);
                 uvs[2 * i] = new Vector2(0, 1 - i / (float)(joints - 1));
                 uvs[2 * i + 1] = new Vector2(1, 1 - i / (float)(joints - 1));
-                //Debug.Log(gameObject.name + " [" + i + "] : columns = [ " + columns[2 * i] + ", " + columns[2 * i + 1] + " ]");
+                //Debug.Log(gameObject.name + " [" + i + "] (Progress: " + localProgress + ") : columns = [ " + columns[2 * i] + ", " + columns[2 * i + 1] + " ]");
             }
 
             mesh.Clear();
