@@ -2336,11 +2336,11 @@ MonoBehaviour:
   resourceBGAPath: 
   resourceBackImagePath: 
   beatmapType: 2
-  allowAutoPlay: 1
+  allowAutoPlay: 0
   disableBGA: 1
-  disableMusic: 1
+  disableMusic: 0
   enableMirror: 0
-  colorMyNote: 1
+  colorMyNote: 0
   modeFile: {fileID: 4900000, guid: 68d584b39a5110c4a99b4d8e1009f90e, type: 3}
   tSystem: {fileID: 2139799184}
   endText: {fileID: 1820286944}
