@@ -376,7 +376,7 @@ namespace TSystem
     {
         public Vector2 AreaRange { get { return new Vector2((float)range[0], (float)range[range.Length - 1]); } }
 
-        public int connectMethod; // 0: Linear, 1: Bezier curve
+        public int connectMethod; // 0: Linear, 1: Bezier curve (De Casteljau), 2: Bezier curve (Bernstein)
         public double[] range; // Range between 0 and 1
         public double[] posX;
         public double[] posY;
@@ -390,7 +390,9 @@ namespace TSystem
                 case 0:
                     return GetLinearPosCoeff(div);
                 case 1:
-                    return GetBezierPosCoeff(div);
+                    return GetDeCasteljauPosCoeff(posX, posY, div);
+                case 2:
+                    return GetBernsteinPosCoeff(div);
                 default:
                     return (t, t);
             }
@@ -419,7 +421,21 @@ namespace TSystem
             }
         }
 
-        (float, float) GetBezierPosCoeff(float d)
+        (float, float) GetDeCasteljauPosCoeff(double[] xarr, double[] yarr, float d)
+        {
+            if(xarr.Length == 1)
+                return ((float)xarr[0], (float)yarr[0]);
+            
+            double[] nx = new double[xarr.Length - 1], ny = new double[yarr.Length - 1];
+            for(int i = 0; i < xarr.Length - 1; i++)
+            {
+                nx[i] = Mathf.LerpUnclamped((float)xarr[i], (float)xarr[i + 1], d);
+                ny[i] = Mathf.LerpUnclamped((float)yarr[i], (float)yarr[i + 1], d);
+            }
+            return GetDeCasteljauPosCoeff(nx, ny, d);
+        }
+
+        (float, float) GetBernsteinPosCoeff(float d)
         {
             var res = Vector2.zero;
             var n = posX.Length - 1;
