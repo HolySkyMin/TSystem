@@ -24,6 +24,8 @@ namespace TSystem
 
         int lineSet;
         float halfWidth;
+        Color32 defaultColor;
+        Color[] colorArray;
 
         public void Set(Note l, Note r)
         {
@@ -33,6 +35,10 @@ namespace TSystem
             // Assume that left / right note have same line set
             lineSet = leftNote.lineSet;
             halfWidth = Mathf.Min(leftNote.halfTailWidth, rightNote.halfTailWidth) * thicknessCoefficient;
+            
+            defaultColor = new Color32((byte) Game.Mode.multilineDefaultColor[0],
+                (byte) Game.Mode.multilineDefaultColor[1], (byte) Game.Mode.multilineDefaultColor[2], 255);
+            
 
             InitializeVertexArrays();
         }
@@ -50,6 +56,10 @@ namespace TSystem
                 tris[j + 1] = i + 1;
                 tris[j + 2] = i + 2;
             }
+            
+            colorArray = new Color[uvs.Length];
+            for (int i = 0; i < colorArray.Length; i++)
+                colorArray[i] = defaultColor;
         }
 
         private void Start()
@@ -89,6 +99,7 @@ namespace TSystem
             mesh.vertices = columns;
             mesh.uv = uvs;
             mesh.triangles = tris;
+            mesh.colors = colorArray;
         }
     }
 }

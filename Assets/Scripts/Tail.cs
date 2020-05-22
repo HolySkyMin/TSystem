@@ -18,10 +18,10 @@ namespace TSystem
         // MeshRenderer, MeshFilter는 GetComponent 로 해결
         public Material material;
         [Range(15, 50)] public int joints = 20;
-        [Header("Basis specific configs")]
-        public bool allowGradientTailMove = false;
-        public bool forceDefaultTilt = false;
-        public Color32 defaultColor = Color.white;
+        
+        [Header("Basis specific flags")]
+        public bool allowGradientTailMove;
+        public bool forceDefaultTilt;
 
         // 메쉬를 구성하는 필수 꼭짓점 데이터들
         protected int[] tris;
@@ -32,6 +32,7 @@ namespace TSystem
         // 데이터들
         float headTime = 0, tailTime = 0, halfWidth;
         bool allowFlexibleTilt;
+        Color32 defaultColor;
         Color[] colorArray;
 
         public void Set(Note h, Note t, bool flexible)
@@ -41,6 +42,8 @@ namespace TSystem
             allowFlexibleTilt = forceDefaultTilt ? false : flexible;
 
             halfWidth = Mathf.Min(headNote.halfTailWidth, tailNote.halfTailWidth);
+            defaultColor = new Color32((byte)Game.Mode.tailDefaultColor[0], (byte)Game.Mode.tailDefaultColor[1],
+                (byte)Game.Mode.tailDefaultColor[2], (byte)Game.Mode.tailDefaultColor[3]);
 
             InitializeVertexArrays();
         }

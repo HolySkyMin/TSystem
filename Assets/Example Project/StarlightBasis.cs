@@ -9,8 +9,6 @@ namespace TSystem.Example
     {
         protected override void Awake()
         {
-            // TODO: Flexible flick threshold
-            flickThreshold = 80;
             maxReachTime = 0;
 
             base.Awake();

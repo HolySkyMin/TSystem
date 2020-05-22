@@ -36,9 +36,6 @@ namespace TSystem
         public bool isVertical;
         public float referenceWidth;
         public float referenceHeight;
-        [Header("Shared setting for all basis")]
-        public int curLineSet;
-        public float flickThreshold;
         [Header("Shared object for all basis")]
         public GameObject[] noteTemplate;
         public GameObject tailTemplate, connectorTemplate, multiLineTemplate;
@@ -53,6 +50,7 @@ namespace TSystem
         public JudgeBasis judge;
         public InputGetter input;
 
+        [HideInInspector] public int curLineSet;
         public Dictionary<int, Note> notes;
 
         public delegate void SpecialLineAnim();
@@ -199,7 +197,7 @@ namespace TSystem
                     }
                 }
 
-                if(activedNotes.Count > 1)
+                if(activedNotes.Count > 1 && Mode.allowMultiline)
                 {
                     activedNotes.Sort((x, y) => notes[x].EndLine > notes[y].EndLine ? 1 : -1);
                     for(int i = 0; i < activedNotes.Count - 1; i++)

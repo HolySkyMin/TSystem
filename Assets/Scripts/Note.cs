@@ -300,6 +300,23 @@ namespace TSystem
                         }
                     }
                     break;
+                case NoteType.SlideEnd:
+                    if (!Game.Mode.checkReleaseInput && Progress >= 1)
+                    {
+                        if(latestSlideJudge != JudgeType.NotJudged)
+                        {
+                            isHit = true;
+                            Game.input.RemoveSlideFinger(slideGroupFinger);
+                            Game.judge.noteQueue[EndLine].Remove(ID);
+                            Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), latestSlideJudge, false, false);
+                            Game.AddScore(data, latestSlideJudge);
+
+                            if (latestSlideJudge == JudgeType.Miss)
+                                isDead = true;
+                            Delete();
+                        }
+                    }
+                    break;
                 case NoteType.Hidden:
                     if (TimeDistance >= Game.Mode.judgeThreshold[1])
                     {
@@ -443,14 +460,16 @@ namespace TSystem
             var res = Game.judge.GetJudge(EndLine, Type, Flick, TimeDistance);
             if (fixAsMiss)
                 res = JudgeType.Miss;
-            if (Type.IsEither(NoteType.HoldEnd, NoteType.SlideEnd) && res == JudgeType.NotJudged)
+            if (Type == NoteType.HoldEnd && res == JudgeType.NotJudged)
+                res = JudgeType.Miss;
+            if (Type == NoteType.SlideEnd && Game.Mode.checkReleaseInput && res == JudgeType.NotJudged)
                 res = JudgeType.Miss;
 
             if (res == JudgeType.NotJudged)
                 return;
 
             // Processing (Slide Middle SAVES the judge, not executing it.)
-            if(Type != NoteType.SlideMiddle)
+            if(Type != NoteType.SlideMiddle && !(!Game.Mode.checkReleaseInput && Type == NoteType.SlideEnd))
             {
                 isHit = true;
                 Game.judge.noteQueue[EndLine].Remove(ID);
@@ -470,7 +489,7 @@ namespace TSystem
                 hitTime = Game.Time;
                 animator.Play("DefaultHoldAnimation");
             }
-            else if (Type == NoteType.SlideMiddle)
+            else if (Type == NoteType.SlideMiddle || (!Game.Mode.checkReleaseInput && Type == NoteType.SlideEnd))
                 latestSlideJudge = res;
             else if (!silent)
                 Delete();

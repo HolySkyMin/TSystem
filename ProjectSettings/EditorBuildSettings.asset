@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Plugins/TSystem/Example Project/ExampleIngame.unity
+    path: Assets/Example Project/ExampleIngame.unity
     guid: 92c55344d3131f942a6ce7fd6a031efb
   m_configObjects: {}

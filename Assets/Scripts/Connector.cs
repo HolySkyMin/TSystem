@@ -12,7 +12,6 @@ namespace TSystem
 
         public Material material;
         public float thicknessCoefficient = 0.5f;
-        public Color32 defaultColor = Color.white;
 
         [HideInInspector] public Note headNote;
         [HideInInspector] public Note tailNote;
@@ -22,6 +21,7 @@ namespace TSystem
         int[] tris;
         Vector2[] uvs;
         Vector3[] columns;
+        Color32 defaultColor;
         Color[] colorArray;
 
         public void Set(Note h, Note t)
@@ -34,6 +34,9 @@ namespace TSystem
             columns = new Vector3[4];
             uvs = new[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1) };
 
+            defaultColor = new Color32((byte) Game.Mode.connectorDefaultColor[0],
+                (byte) Game.Mode.connectorDefaultColor[1], (byte) Game.Mode.connectorDefaultColor[2],
+                (byte) Game.Mode.connectorDefaultColor[3]);
             colorArray = new Color[uvs.Length];
             for (int i = 0; i < colorArray.Length; i++)
                 colorArray[i] = TSystemConfig.Now.colorNote ? headNote.ColorKey : defaultColor;
