@@ -50,6 +50,12 @@ namespace TSystem
                 lineEnd[line.Key] = Game.Mode.GetEndPos(Game.curLineSet, line.Key);
         }
 
+        public void RemoveSlideFinger(int fingerId)
+        {
+            slidingNote.RemoveAt(slidingFinger.IndexOf(fingerId));
+            slidingFinger.Remove(fingerId);
+        }
+
         void Update()
         {
             foreach (var line in lineInput)
@@ -162,9 +168,10 @@ namespace TSystem
                                     if (touch.fingerId == target.slideGroupFinger && touch.phase == TouchPhase.Ended)
                                     {
                                         target.Judge();
-                                        slidingNote.RemoveAt(slidingFinger.IndexOf(touch.fingerId));
-                                        slidingFinger.Remove(touch.fingerId);
+                                        RemoveSlideFinger(touch.fingerId);
                                     }
+                                    else if (!Game.Mode.checkReleaseInput && touch.fingerId == target.slideGroupFinger && touch.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
+                                        target.Judge();
                                     break;
                             }
                         }
@@ -191,10 +198,7 @@ namespace TSystem
                             if (target.Type == NoteType.HoldEnd)
                                 line.isHolding = false;
                             if (target.Type == NoteType.SlideEnd)
-                            {
-                                slidingNote.RemoveAt(slidingFinger.IndexOf(target.slideGroupFinger));
-                                slidingFinger.Remove(target.slideGroupFinger);
-                            }
+                                RemoveSlideFinger(target.slideGroupFinger);
                         }
                     }
                 }
@@ -212,8 +216,26 @@ namespace TSystem
                 var line = lineInput[touch.Key];
                 var target = line.GetTargetNote();
 
+                if (!Game.Mode.checkReleaseInput && touch.Value.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
+                {
+                    if (target != null && target.Type == NoteType.HoldEnd && target.Flick == FlickType.NotFlick && target.Progress >= 1)
+                    {
+                        if (isValidTouch[Game.Mode.judgeRule](touch.Key, pos))
+                            target.Judge();
+                        else
+                        {
+                            Game.notes[line.holdingNote].isDead = true;
+                            if (!Game.notes[line.holdingNote].nextNote.isAppeared)
+                            {
+                                Game.judge.UpdateJudgeResult((int)line.line, JudgeType.Miss, false, false, false);
+                                Game.notes[line.holdingNote].Delete();
+                            }
+                        }
+                    }
+                }
+                
                 // Holding and RELEASED,
-                if (touch.Value.phase == TouchPhase.Ended)
+                else if (touch.Value.phase == TouchPhase.Ended)
                 {
                     // If at proper location,
                     if (isValidTouch[Game.Mode.judgeRule](touch.Key, pos))
@@ -251,8 +273,7 @@ namespace TSystem
                 {
                     Game.judge.UpdateJudgeResult(0, JudgeType.Miss, false, false, false);
                     Game.notes[slidingNote[slidingFinger.IndexOf(touch.fingerId)]].isDead = true;
-                    slidingNote.RemoveAt(slidingFinger.IndexOf(touch.fingerId));
-                    slidingFinger.Remove(touch.fingerId);
+                    RemoveSlideFinger(touch.fingerId);
                 }
             }
 

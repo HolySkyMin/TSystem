@@ -41,8 +41,29 @@ namespace TSystem
 
         public TSModeKeyframeArea[] keyframePath;
         public TSModeKeyframeArea[] keyframeScale;
+        
+        // Controllable Flags and Values of Basis
+        // - Notes
+        public double flickThreshold;
+        public bool checkReleaseInput;
+        // - Multilines
+        public bool allowMultiline;
+        // - Mesh Colors
+        public int[] tailDefaultColor;
+        public int[] connectorDefaultColor;
+        public int[] multilineDefaultColor;
 
         ExpressionDelegate eScaledT, ePathX, ePathY, eScaleX, eScaleY;
+
+        public TSystemMode()
+        {
+            flickThreshold = 75;
+            checkReleaseInput = true;
+            allowMultiline = true;
+            tailDefaultColor = new[] {255, 255, 255, 255};
+            connectorDefaultColor = new[] {255, 255, 255, 255};
+            multilineDefaultColor = new[] {255, 255, 255, 255};
+        }
 
         public void SetArguments()
         {

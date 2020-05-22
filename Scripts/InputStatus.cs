@@ -115,7 +115,7 @@ namespace TSystem
 
         public bool IsFlickEnough()
         {
-            return flickMovedDistance >= IngameBasis.Now.flickThreshold;
+            return flickMovedDistance >= IngameBasis.Now.Mode.flickThreshold;
         }
 
         public void SetFlickHit()
