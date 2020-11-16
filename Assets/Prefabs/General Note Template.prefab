@@ -60,6 +60,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -85,6 +86,7 @@ GameObject:
   - component: {fileID: 7954948668754125004}
   - component: {fileID: 7954948668754125005}
   - component: {fileID: 7954948668754125006}
+  - component: {fileID: -6107036711560305898}
   m_Layer: 5
   m_Name: General Note Template
   m_TagString: Untagged
@@ -171,6 +173,23 @@ MonoBehaviour:
   previousConnectors: []
   image: {fileID: 7954948669579015242}
   animator: {fileID: 7954948668754125005}
+  allowHoldingScore: 0
+--- !u!114 &-6107036711560305898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7954948668754125008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6efc116b1dab2b499583c23a876e05c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flickStarted: 0
+  flickStartPos: {x: 0, y: 0}
+  flickMovedDistance: 0
+  flickFinger: 0
 --- !u!1 &7954948669579015244
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +250,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

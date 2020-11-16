@@ -200,7 +200,6 @@ namespace TSystem
                 Check();
                 Move();
                 Process();
-                GetInput();
             }
             AfterUpdate();
         }
@@ -359,28 +358,6 @@ namespace TSystem
                 //    Delete();
                 //}
             }
-        }
-
-        protected virtual void GetInput()
-        {
-            if(Game.IsAutoPlay && (int)Type < 10 && Type != NoteType.Hidden)
-            {
-                if (Progress >= 1 && !isHit)
-                    Judge();
-            }
-
-            //if(Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && allowHoldingScore)
-            //{
-            //    foreach(var touch in Input.touches)
-            //    {
-            //        if(touch.fingerId == slideGroupFinger)
-            //        {
-            //            var pos = Game.GetTouchPos(touch.position);
-            //            if (Vector2.Distance(pos, Body.anchoredPosition) <= halfJudgeWidth)
-            //                Game.AddHoldingScore();
-            //        }
-            //    }
-            //}
         }
 
         protected virtual void AfterUpdate()
