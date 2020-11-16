@@ -45,7 +45,9 @@ namespace TSystem
         // Controllable Flags and Values of Basis
         // - Notes
         public double flickThreshold;
-        public bool checkReleaseInput;
+        public bool requireReleaseAtSlideEnd;
+        public bool requireHoldToSustainSlide;
+        public bool enableStrictSlideJudge;
         // - Multilines
         public bool allowMultiline;
         // - Mesh Colors
@@ -58,7 +60,9 @@ namespace TSystem
         public TSystemMode()
         {
             flickThreshold = 75;
-            checkReleaseInput = true;
+            requireReleaseAtSlideEnd = true;
+            requireHoldToSustainSlide = true;
+            enableStrictSlideJudge = false;
             allowMultiline = true;
             tailDefaultColor = new[] {255, 255, 255, 255};
             connectorDefaultColor = new[] {255, 255, 255, 255};
