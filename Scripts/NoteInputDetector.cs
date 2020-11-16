@@ -222,6 +222,18 @@ namespace TSystem
             if (note.Flick == FlickType.NotFlick)
                 return;
 
+            // Extraordinary case: If this flick note is slide end
+            // In this case, we prevent it being hit even before all other slides pass the judge line.
+            if(note.Type.IsEither(NoteType.SlideEnd))
+            {
+                bool allowFlag = false;
+                foreach (var prev in note.previousNotes)
+                    if (prev.Type == NoteType.SlideEnd)
+                        allowFlag = true;
+                if (!allowFlag)
+                    return;
+            }
+
             foreach (var touch in validTouch)
             {
                 if(touch.phase == TouchPhase.Moved)

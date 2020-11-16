@@ -399,6 +399,7 @@ namespace TSystem
 
             nextNote.previousNotes.Remove(this);
             nextNote.previousNotes.Add(prev);
+            previousNotes.Remove(prev);
 
             slideTransfered = true;
         }
