@@ -80,7 +80,7 @@ namespace TSystem
         {
             lineEnd.Add(line, Game.Mode.GetEndPos(Game.curLineSet, line));
             lines.Add(line, new NoteInputLine(line));
-            Debug.Log($"Line {lines[line].line} added to game.");
+            //Debug.Log($"Line {lines[line].line} added to game.");
         }
 
         /// <summary>
@@ -96,13 +96,13 @@ namespace TSystem
         public void AddNote(float line, int id)
         {
             lines[line].notes.Add(id);
-            Debug.Log($"Note {id} added to line {lines[line].line}");
+            //Debug.Log($"Note {id} added to line {lines[line].line}");
         }
 
         public void RemoveNote(float line, int id)
         {
             lines[line].notes.Remove(id);
-            Debug.Log($"Note {id} removed from line {lines[line].line}");
+            //Debug.Log($"Note {id} removed from line {lines[line].line}");
         }
 
         public bool IsInputTarget(float line, int id)
