@@ -154,7 +154,7 @@ namespace TSystem
                                 break;
 
                             // This case, the note should be the input target.
-                            if(Manager.IsInputTarget(note.EndLine, note.ID))
+                            if(Manager.IsInputTarget(note.EndLine, note.ID) && Manager.IsValidTouch(note.EndLine, pos))
                                 note.JudgeHold();
                             break;
                     }
@@ -206,7 +206,7 @@ namespace TSystem
                             // Only consider the touch which is for this note. Otherwise, Starts will judge the note... maybe.
                             if (Manager.IsInputTarget(note.EndLine, note.ID) && Manager.IsValidTouch(note.EndLine, pos))
                             {
-                                note.Judge();
+                                note.Judge(note.Flick != FlickType.NotFlick);
                             }
                             break;
                     }
@@ -226,7 +226,7 @@ namespace TSystem
             {
                 if(touch.phase == TouchPhase.Moved)
                 {
-                    if (!flickStarted)
+                    if (!flickStarted && !Manager.lines[note.EndLine].flickHitted[note.Flick])
                         StartFlick(touch);
                     
                     if(touch.fingerId == flickFinger)
@@ -252,8 +252,7 @@ namespace TSystem
                                 break;
                         }
 
-                        if (flickMovedDistance >= Game.Mode.flickThreshold && note.TimeDistance >= -Game.Mode.judgeThreshold[5]
-                            && !Manager.lines[note.EndLine].flickHitted[note.Flick])
+                        if (flickMovedDistance >= Game.Mode.flickThreshold && note.TimeDistance >= -Game.Mode.judgeThreshold[5])
                         {
                             note.Judge();
 
