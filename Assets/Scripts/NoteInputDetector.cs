@@ -228,7 +228,7 @@ namespace TSystem
             {
                 bool allowFlag = false;
                 foreach (var prev in note.previousNotes)
-                    if (prev.Type == NoteType.SlideEnd)
+                    if (prev.Type == NoteType.SlideStart)
                         allowFlag = true;
                 if (!allowFlag)
                     return;
