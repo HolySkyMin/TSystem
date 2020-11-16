@@ -216,20 +216,22 @@ namespace TSystem
 
         protected virtual void CheckFlick()
         {
-            if (!Manager.IsInputTarget(note.EndLine, note.ID))
+            // This note should be input target and able to be judged.
+            if (!Manager.IsInputTarget(note.EndLine, note.ID) && note.TimeDistance < -Game.Mode.judgeThreshold[5])
                 return;
 
+            // Of course, flick note is only allowed.
             if (note.Flick == FlickType.NotFlick)
                 return;
 
-            // Extraordinary case: If this flick note is slide end
+            // Extraordinary case: If this flick note is slide end.
             // In this case, we prevent it being hit even before all other slides pass the judge line.
-            if(note.Type.IsEither(NoteType.SlideEnd))
+            if(note.Type == NoteType.SlideEnd)
             {
-                bool allowFlag = false;
+                bool allowFlag = true;
                 foreach (var prev in note.previousNotes)
-                    if (prev.Type == NoteType.SlideStart)
-                        allowFlag = true;
+                    if (prev.Type == NoteType.SlideMiddle)
+                        allowFlag = false;
                 if (!allowFlag)
                     return;
             }
@@ -264,7 +266,7 @@ namespace TSystem
                                 break;
                         }
 
-                        if (flickMovedDistance >= Game.Mode.flickThreshold && note.TimeDistance >= -Game.Mode.judgeThreshold[5])
+                        if (flickMovedDistance >= Game.Mode.flickThreshold)
                         {
                             note.Judge();
 
