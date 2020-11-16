@@ -31,9 +31,18 @@ namespace TSystem
         {
             if(Game.IsStarted)
             {
-                foreach (var line in lines.Values)
+                foreach (var l in lines)
                 {
+                    var line = l.Value;
+
                     line.UpdateCooltime();
+
+                    // Note garbage collection
+                    while (line.notes.Count > 0 && (Game.notes[line.notes[0]].isHit || Game.notes[line.notes[0]].isDead))
+                    {
+                        TSystemStatic.LogWarning($"Undeleted dead/hit note ({line.notes[0]}) detected in line {l.Key}! Removing it.");
+                        RemoveNote(l.Key, line.notes[0]);
+                    }
                 }
             }
         }
