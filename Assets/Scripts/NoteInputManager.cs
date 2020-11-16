@@ -21,17 +21,20 @@ namespace TSystem
         /// </summary>
         IngameBasis Game { get { return IngameBasis.Now; } }
 
-        [HideInInspector] public Dictionary<float, Vector2> lineEnd = new Dictionary<float, Vector2>();
-        [HideInInspector] public Dictionary<float, NoteInputLine> lines = new Dictionary<float, NoteInputLine>();
+        [HideInInspector] public Dictionary<float, Vector2> lineEnd;
+        [HideInInspector] public Dictionary<float, NoteInputLine> lines;
 
         List<Func<float, Vector2, bool>> isValidTouch;
 
         // Update is called once per frame
         void Update()
         {
-            foreach(var line in lines.Values)
+            if(Game.IsStarted)
             {
-                line.UpdateCooltime();
+                foreach (var line in lines.Values)
+                {
+                    line.UpdateCooltime();
+                }
             }
         }
 
@@ -47,6 +50,8 @@ namespace TSystem
                 (line, pos) => pos.x.IsBetween(lineEnd[line].x - HalfWidth, lineEnd[line].x + HalfWidth, true, false) && pos.y.IsBetween(lineEnd[line].y - HalfWidth, lineEnd[line].y + HalfWidth, true, false),
                 (line, pos) => Vector2.Distance(pos, lineEnd[line]) <= HalfWidth
             };
+            lineEnd = new Dictionary<float, Vector2>();
+            lines = new Dictionary<float, NoteInputLine>();
         }
 
         /// <summary>
@@ -75,6 +80,7 @@ namespace TSystem
         {
             lineEnd.Add(line, Game.Mode.GetEndPos(Game.curLineSet, line));
             lines.Add(line, new NoteInputLine(line));
+            Debug.Log($"Line {lines[line].line} added to game.");
         }
 
         /// <summary>
@@ -90,11 +96,13 @@ namespace TSystem
         public void AddNote(float line, int id)
         {
             lines[line].notes.Add(id);
+            Debug.Log($"Note {id} added to line {lines[line].line}");
         }
 
         public void RemoveNote(float line, int id)
         {
             lines[line].notes.Remove(id);
+            Debug.Log($"Note {id} removed from line {lines[line].line}");
         }
 
         public bool IsInputTarget(float line, int id)

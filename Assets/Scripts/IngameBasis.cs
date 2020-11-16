@@ -301,6 +301,8 @@ namespace TSystem
             }
             linePanels[beforeLine].fullBody.alpha = 0;
             linePanels[newLineSet].fullBody.alpha = 1;
+
+            noteInput.UpdateLinePos();
         }
 
         public virtual void TriggerSpecialEnter()
