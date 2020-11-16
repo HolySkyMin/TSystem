@@ -170,7 +170,7 @@ namespace TSystem
                                         target.Judge();
                                         RemoveSlideFinger(touch.fingerId);
                                     }
-                                    else if (!Game.Mode.checkReleaseInput && touch.fingerId == target.slideGroupFinger && touch.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
+                                    if (!Game.Mode.requireReleaseAtSlideEnd && touch.fingerId == target.slideGroupFinger && touch.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
                                         target.Judge();
                                     break;
                             }
@@ -216,7 +216,7 @@ namespace TSystem
                 var line = lineInput[touch.Key];
                 var target = line.GetTargetNote();
 
-                if (!Game.Mode.checkReleaseInput && touch.Value.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
+                if (!Game.Mode.requireReleaseAtSlideEnd && touch.Value.phase.IsEither(TouchPhase.Began, TouchPhase.Stationary, TouchPhase.Moved))
                 {
                     if (target != null && target.Type == NoteType.HoldEnd && target.Flick == FlickType.NotFlick && target.Progress >= 1)
                     {

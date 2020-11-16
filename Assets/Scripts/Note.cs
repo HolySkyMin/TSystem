@@ -152,33 +152,27 @@ namespace TSystem
             }
         }
 
+        /// <summary>
+        /// Called right before the note appears to the game.
+        /// </summary>
         public void Wakeup()
         {
+            // If the note is a part of hold or slide notes and not Starts...
             if(Type.IsEither(NoteType.HoldEnd, NoteType.SlideMiddle, NoteType.SlideEnd))
             {
                 foreach (var note in previousNotes)
                 {
+                    // If previous note is same group and it is dead...
                     if (note.Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && note.isDead)
                     {
-                        isHit = true;
-                        isDead = true;
-                        Judge(true, true);
-                        Delete();
+                        // Then this note is also dead, right?
+                        Judge(JudgeType.Miss, true);
                         return;
                     }
                 }
             }
 
-            if((int)Type < 10)
-            {
-                if (!Game.judge.noteQueue.ContainsKey(EndLine))
-                {
-                    Game.judge.AddLine(EndLine);
-                    Game.input.AddLine(EndLine);
-                }
-                Game.judge.noteQueue[EndLine].Add(ID);
-            }
-
+            // Sets image.
             image.sprite = Game.GetNoteImage(data);
             if (Game.IsNoteColored)
                 image.color = ColorKey;
@@ -187,6 +181,7 @@ namespace TSystem
             if (Type == NoteType.Hidden)
                 image.color = Color.clear;
 
+            // Turns on tail and connector.
             if (nextTail != null)
                 nextTail.gameObject.SetActive(true);
             if (nextConnector != null)
@@ -222,23 +217,14 @@ namespace TSystem
                 foreach (var note in previousNotes)
                 {
                     if (note.Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && note.isDead)
-                    {
-                        isDead = true;
-                        Judge(true);
-                        if (Type == NoteType.SlideMiddle)
-                        {
-                            Game.judge.noteQueue[EndLine].Remove(ID);
-                            Delete();
-                        }
-                    }
-                    if (Type.IsEither(NoteType.SlideMiddle, NoteType.SlideEnd) && note.Type.IsEither(NoteType.SlideStart, NoteType.SlideMiddle))
-                    {
+                        Judge(JudgeType.Miss);
+                    if (Type.IsEither(NoteType.HoldEnd, NoteType.SlideMiddle, NoteType.SlideEnd) 
+                        && note.Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle))
                         slideGroupFinger = note.slideGroupFinger;
-                    }
                 }
             }
-            if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
-                Delete();
+            //if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
+            //    Delete();
         }
 
         protected virtual void Move()
@@ -246,12 +232,13 @@ namespace TSystem
             // Tail and Connector process their positions by themselves. They are smart!
             if(isAppeared)
             {
+                // Special move of SlideStart note between end lines.
                 if(Type == NoteType.SlideStart && (isHit || Progress >= 1))
                 {
                     var progress = (nextNote.ReachTime - Game.Time) / (nextNote.ReachTime - Mathf.Min(hitTime, ReachTime));
                     Body.anchoredPosition = Vector2.Lerp(nextNote.endPos, endPos, progress);
                 }
-                else
+                else  // Normal note move
                 {
                     if (!isHit)
                     {
@@ -267,60 +254,44 @@ namespace TSystem
             switch(Type)
             {
                 case NoteType.Damage:
+                    // If this note passed the judging line
+                    // (Executing this means that this note has not been hit),
                     if(Progress >= 1)
                         Judge();
                     break;
                 case NoteType.SlideStart:
-                    if (nextNote.Type == NoteType.SlideEnd && nextNote.Progress >= 1)
-                    {
-                        if (!isHit)
-                        {
-                            foreach (var line in Game.judge.noteQueue)
-                                line.Value.Remove(ID);
-                        }
-                        Delete();
-                    }
+                    // If next note of slide group is SlideEnd and it passed the judging line
+                    // while this note not being hit,
+                    if (!isHit && nextNote.Type == NoteType.SlideEnd && nextNote.Progress >= 1)
+                        Judge(JudgeType.Miss);  // This slide group is dead.
                     break;
                 case NoteType.SlideMiddle:
+                    // When this note passed the judging line...
                     if(Progress >= 1)
                     {
+                        // Detach this note from slide group and
+                        // connect previous note and next note for once.
                         if (!slideTransfered)
                             TransferToBefore();
-                        if(latestSlideJudge != JudgeType.NotJudged)
-                        {
-                            // Slide Middle Judging
-                            isHit = true;
-                            Game.judge.noteQueue[EndLine].Remove(ID);
-                            Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), latestSlideJudge, false, false);
-                            Game.AddScore(data, latestSlideJudge);
 
-                            if (latestSlideJudge == JudgeType.Miss)
-                                isDead = true;
-                            Delete();
-                        }
+                        // Checks the latest slide judge every frame.
+                        // If it has any judging result, judges it.
+                        if (latestSlideJudge != JudgeType.NotJudged)
+                            Judge(latestSlideJudge);
                     }
                     break;
                 case NoteType.SlideEnd:
-                    if (!Game.Mode.checkReleaseInput && Progress >= 1)
+                    // If the mode does not require release at this note and it passed the judging line...
+                    if (!Game.Mode.requireReleaseAtSlideEnd && Progress >= 1)
                     {
-                        if(latestSlideJudge != JudgeType.NotJudged)
-                        {
-                            isHit = true;
-                            Game.input.RemoveSlideFinger(slideGroupFinger);
-                            Game.judge.noteQueue[EndLine].Remove(ID);
-                            Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), latestSlideJudge, false, false);
-                            Game.AddScore(data, latestSlideJudge);
-
-                            if (latestSlideJudge == JudgeType.Miss)
-                                isDead = true;
-                            Delete();
-                        }
+                        if (!isHit && latestSlideJudge != JudgeType.NotJudged)
+                            Judge(latestSlideJudge);
                     }
                     break;
                 case NoteType.Hidden:
                     if (TimeDistance >= Game.Mode.judgeThreshold[1])
                     {
-                        Game.judge.noteQueue[EndLine].Remove(ID);
+                        Game.noteInput.RemoveNote(EndLine, ID);
                         Delete();
                     }
                     break;
@@ -374,19 +345,19 @@ namespace TSystem
 
             if (!isHit && TimeDistance >= Game.Mode.judgeThreshold[5])   // So, when the note is not hit and reached the end...
             {
-                Judge(true);
-                if (Type == NoteType.HoldEnd)
-                    foreach (var note in previousNotes)
-                        if (note.Type == NoteType.HoldStart)
-                            note.Delete();
-                if(Type == NoteType.SlideStart)
-                {
-                    Game.judge.noteQueue[EndLine].Remove(ID);
-                    Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), JudgeType.Miss, false, false);
-                    Game.AddScore(data, JudgeType.Miss);
-                    isDead = true;
-                    Delete();
-                }
+                Judge(JudgeType.Miss);
+                //if (Type == NoteType.HoldEnd)
+                //    foreach (var note in previousNotes)
+                //        if (note.Type == NoteType.HoldStart)
+                //            note.Delete();
+                //if(Type == NoteType.SlideStart)
+                //{
+                //    Game.judge.noteQueue[EndLine].Remove(ID);
+                //    Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), JudgeType.Miss, false, false);
+                //    Game.AddScore(data, JudgeType.Miss);
+                //    isDead = true;
+                //    Delete();
+                //}
             }
         }
 
@@ -398,18 +369,18 @@ namespace TSystem
                     Judge();
             }
 
-            if(Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && allowHoldingScore)
-            {
-                foreach(var touch in Input.touches)
-                {
-                    if(touch.fingerId == slideGroupFinger)
-                    {
-                        var pos = Game.GetTouchPos(touch.position);
-                        if (Vector2.Distance(pos, Body.anchoredPosition) <= halfJudgeWidth)
-                            Game.AddHoldingScore();
-                    }
-                }
-            }
+            //if(Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && allowHoldingScore)
+            //{
+            //    foreach(var touch in Input.touches)
+            //    {
+            //        if(touch.fingerId == slideGroupFinger)
+            //        {
+            //            var pos = Game.GetTouchPos(touch.position);
+            //            if (Vector2.Distance(pos, Body.anchoredPosition) <= halfJudgeWidth)
+            //                Game.AddHoldingScore();
+            //        }
+            //    }
+            //}
         }
 
         protected virtual void AfterUpdate()
@@ -455,44 +426,69 @@ namespace TSystem
             slideTransfered = true;
         }
 
+        /// <summary>
+        /// Judges the note by getting judge result from input.
+        /// As long as the judge is not silent, this note will be deleted after calling this.
+        /// </summary>
+        /// <param name="fixAsMiss">Flag about if this note should be force-judged as miss.</param>
+        /// <param name="silent">Flag about if this note should be judged without combo reset (and effect).</param>
         public void Judge(bool fixAsMiss = false, bool silent = false)
         {
+            // Gets (and modifies) the judge.
             var res = Game.judge.GetJudge(EndLine, Type, Flick, TimeDistance);
             if (fixAsMiss)
                 res = JudgeType.Miss;
-            if (Type == NoteType.HoldEnd && res == JudgeType.NotJudged)
-                res = JudgeType.Miss;
-            if (Type == NoteType.SlideEnd && Game.Mode.checkReleaseInput && res == JudgeType.NotJudged)
+            if (Type.IsEither(NoteType.HoldEnd, NoteType.SlideEnd) && res == JudgeType.NotJudged)
                 res = JudgeType.Miss;
 
             if (res == JudgeType.NotJudged)
+                return;  // Now is not the time to be judged...
+
+            Judge(res, silent);
+        }
+
+        /// <summary>
+        /// Judges the note by given judge result.
+        /// As long as the judge is not silent, this note will be deleted after calling this.
+        /// </summary>
+        /// <param name="fixAsMiss">Flag about if this note should be force-judged as miss.</param>
+        /// <param name="silent">Flag about if this note should be judged without combo reset (and effect).</param>
+        public void Judge(JudgeType judgeType, bool silent = false)
+        {
+            if (judgeType == JudgeType.NotJudged)
                 return;
+            
+            // Here, this note should be 'judged' for some result and processed.
 
-            // Processing (Slide Middle SAVES the judge, not executing it.)
-            if(Type != NoteType.SlideMiddle && !(!Game.Mode.checkReleaseInput && Type == NoteType.SlideEnd))
+            isHit = true;  // This note is being hit now.
+            Game.noteInput.RemoveNote(EndLine, ID);
+            Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), judgeType, Flick != FlickType.NotFlick, silent);
+            Game.AddScore(data, judgeType);
+
+            // Postprocessing depending on the type of note.
+
+            // If the note is Start note and the result is Miss,
+            if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && judgeType == JudgeType.Miss)
+                isDead = true;  // This note is dead.
+
+            // If the note is Start note and the result is NOT Miss,
+            if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && judgeType != JudgeType.Miss)
             {
-                isHit = true;
-                Game.judge.noteQueue[EndLine].Remove(ID);
-
-                Game.judge.UpdateJudgeResult(Mathf.RoundToInt(EndLine), res, Flick != FlickType.NotFlick, silent);
-                Game.AddScore(data, res);
-            }
-
-            if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && res == JudgeType.Miss)
-                isDead = true;
-
-            if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && res != JudgeType.Miss)
-            {
-                Body.localScale = Vector3.one;
+                Body.localScale = Game.Mode.GetScale(1);  // Fixes the scale as the end scale.
+                // If the note is HoldStart, hides the note instead of deleting.
                 if (Type == NoteType.HoldStart)
                     HoldHide();
                 hitTime = Game.Time;
                 animator.Play("DefaultHoldAnimation");
             }
-            else if (Type == NoteType.SlideMiddle || (!Game.Mode.checkReleaseInput && Type == NoteType.SlideEnd))
-                latestSlideJudge = res;
-            else if (!silent)
+            else
                 Delete();
+        }
+
+        public void JudgeHold()
+        {
+            // Judge for Hold-Passing Judge, for example: SlideMiddle, SlideEnd with require false
+            latestSlideJudge = Game.judge.GetJudge(EndLine, Type, Flick, TimeDistance);
         }
 
         public void HoldHide()

@@ -49,6 +49,7 @@ namespace TSystem
         public BackgroundPlayer backPlayer;
         public JudgeBasis judge;
         public InputGetter input;
+        public NoteInputManager noteInput;
 
         [HideInInspector] public int curLineSet;
         public Dictionary<int, Note> notes;
@@ -153,7 +154,8 @@ namespace TSystem
             }
 
             // Game values initializing
-            input.Initialize();
+            //input.Initialize();
+            noteInput.Initialize();
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             ReadyToPlay = true;
         }
@@ -192,8 +194,14 @@ namespace TSystem
                     {
                         note.Value.transform.SetAsFirstSibling();
                         note.Value.Wakeup();
-                        if((int)note.Value.Type < 10 && note.Value.Type != NoteType.Hidden)
-                            activedNotes.Add(note.Key);
+
+                        if((int)note.Value.Type < 10)
+                        {
+                            if(!IsAutoPlay)
+                                note.Value.gameObject.AddComponent<NoteInputDetector>();
+                            if (note.Value.Type != NoteType.Hidden)
+                                activedNotes.Add(note.Key);
+                        }
                     }
                 }
 

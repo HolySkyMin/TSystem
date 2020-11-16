@@ -26,6 +26,8 @@ namespace TSystem
         public Vector2 flickStartPos;
         public float flickMovedDistance;
 
+        public Queue<int> notes;
+
         public InputStatus(float l)
         {
             line = l;
@@ -53,6 +55,8 @@ namespace TSystem
                 {FlickType.Down, 0 },
                 {FlickType.Free, 0 }
             };
+
+            notes = new Queue<int>();
         }
 
         public Note GetTargetNote()
