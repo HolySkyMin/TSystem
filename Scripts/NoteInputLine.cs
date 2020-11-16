@@ -43,9 +43,11 @@ namespace TSystem
         public void UpdateCooltime()
         {
             tapHitted = false;
-            foreach(var flick in flickHitted.Keys)
+
+            for(int i = 1; i <= 5; i++)
             {
-                if(flickHitted[flick])
+                var flick = (FlickType)i;
+                if (flickHitted[flick])
                 {
                     flickCooltime[flick] -= Time.deltaTime;
                     if (flickCooltime[flick] <= 0)
