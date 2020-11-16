@@ -195,13 +195,8 @@ namespace TSystem
                         note.Value.transform.SetAsFirstSibling();
                         note.Value.Wakeup();
 
-                        if((int)note.Value.Type < 10)
-                        {
-                            if(!IsAutoPlay)
-                                note.Value.gameObject.AddComponent<NoteInputDetector>();
-                            if (note.Value.Type != NoteType.Hidden)
-                                activedNotes.Add(note.Key);
-                        }
+                        if((int)note.Value.Type < 10 && note.Value.Type != NoteType.Hidden)
+                            activedNotes.Add(note.Key);
                     }
                 }
 

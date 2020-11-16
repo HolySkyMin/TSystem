@@ -26,10 +26,10 @@ namespace TSystem
         protected Note note;
         protected List<Touch> validTouch;
 
-        public bool flickStarted;
-        public Vector2 flickStartPos;
-        public float flickMovedDistance;
-        public int flickFinger;
+        protected bool flickStarted;
+        protected Vector2 flickStartPos;
+        protected float flickMovedDistance;
+        protected int flickFinger;
 
         protected bool isHolding;
 
@@ -46,9 +46,19 @@ namespace TSystem
 
         protected virtual void Update()
         {
+            if(Game.IsAutoPlay)
+            {
+                if((int)note.Type < 10 && note.Type != NoteType.Hidden)
+                {
+                    if (note.Progress > 1 && !note.isHit)
+                        note.Judge();
+                }
+                return;
+            }
+
             validTouch.Clear();
 
-            foreach(var touch in Input.touches)
+            foreach (var touch in Input.touches)
             {
                 var pos = Game.GetTouchPos(touch.position);
                 if (Manager.IsValidTouch(note.EndLine, pos) || touch.fingerId.IsEither(note.slideGroupFinger, flickFinger))
