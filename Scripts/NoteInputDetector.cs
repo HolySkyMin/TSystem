@@ -35,14 +35,17 @@ namespace TSystem
 
         protected virtual void Start()
         {
-            note = GetComponent<Note>();
-            validTouch = new List<Touch>();
+            if((int)note.Type < 10)
+            {
+                note = GetComponent<Note>();
+                validTouch = new List<Touch>();
 
-            if (!Manager.lines.ContainsKey(note.EndLine))
-                Manager.AddLine(note.EndLine);
-            Manager.AddNote(note.EndLine, note.ID);
+                if (!Manager.lines.ContainsKey(note.EndLine))
+                    Manager.AddLine(note.EndLine);
+                Manager.AddNote(note.EndLine, note.ID);
 
-            flickFinger = 100;
+                flickFinger = 100;
+            }
         }
 
 
@@ -57,6 +60,9 @@ namespace TSystem
                 }
                 return;
             }
+
+            if ((int)note.Type >= 10)
+                return;
 
             validTouch.Clear();
 
@@ -93,38 +99,31 @@ namespace TSystem
                     // Here, the touch is finally assumed to be 'Tap'.
                     // This means that the user has tapped for this note.
 
-                    // If this is the flick note and flick has not been started, starts the flick input.
-                    if (note.Flick != FlickType.NotFlick && !flickStarted)
-                        StartFlick(touch);
-                    // Else, checks the tap input.
-                    else if(note.Flick == FlickType.NotFlick)
+                    switch (note.Type)
                     {
-                        switch(note.Type)
-                        {
-                            case NoteType.Tap:
-                            case NoteType.Hidden:
-                            case NoteType.Damage:
-                                if(Manager.lines[note.EndLine].tapHitted)
-                                {
-                                    note.Judge(note.Type == NoteType.Damage);
-                                    Manager.lines[note.EndLine].tapHitted = note.isHit;
-                                }
-                                break;
-                            case NoteType.HoldStart:
-                            case NoteType.SlideStart:
-                                if(Manager.lines[note.EndLine].tapHitted)
-                                {
-                                    note.Judge();
-                                    Manager.lines[note.EndLine].tapHitted = note.isHit;
+                        case NoteType.Tap:
+                        case NoteType.Hidden:
+                        case NoteType.Damage:
+                            if (!Manager.lines[note.EndLine].tapHitted)
+                            {
+                                note.Judge(note.Type == NoteType.Damage);
+                                Manager.lines[note.EndLine].tapHitted = note.isHit;
+                            }
+                            break;
+                        case NoteType.HoldStart:
+                        case NoteType.SlideStart:
+                            if (!Manager.lines[note.EndLine].tapHitted)
+                            {
+                                note.Judge();
+                                Manager.lines[note.EndLine].tapHitted = note.isHit;
 
-                                    if(note.isHit && !note.isDead)
-                                    {
-                                        isHolding = true;
-                                        note.slideGroupFinger = touch.fingerId;
-                                    }
+                                if (note.isHit && !note.isDead)
+                                {
+                                    isHolding = true;
+                                    note.slideGroupFinger = touch.fingerId;
                                 }
-                                break;
-                        }
+                            }
+                            break;
                     }
                 }
             }
@@ -216,6 +215,9 @@ namespace TSystem
 
         protected virtual void CheckFlick()
         {
+            if (!Manager.IsInputTarget(note.EndLine, note.ID))
+                return;
+
             if (note.Flick == FlickType.NotFlick)
                 return;
 
@@ -226,35 +228,38 @@ namespace TSystem
                     if (!flickStarted)
                         StartFlick(touch);
                     
-                    var pos = Game.GetTouchPos(touch.position);
-                    
-                    switch(note.Flick)
+                    if(touch.fingerId == flickFinger)
                     {
-                        case FlickType.Left:
-                            flickMovedDistance = flickStartPos.x - pos.x;
-                            break;
-                        case FlickType.Right:
-                            flickMovedDistance = pos.x - flickStartPos.x;
-                            break;
-                        case FlickType.Up:
-                            flickMovedDistance = pos.y - flickStartPos.y;
-                            break;
-                        case FlickType.Down:
-                            flickMovedDistance = flickStartPos.y - pos.y;
-                            break;
-                        case FlickType.Free:
-                            flickMovedDistance = Vector2.Distance(flickStartPos, pos);
-                            break;
-                    }
+                        var pos = Game.GetTouchPos(touch.position);
 
-                    if(flickMovedDistance >= Game.Mode.flickThreshold && note.TimeDistance >= -Game.Mode.judgeThreshold[5]
-                        && !Manager.lines[note.EndLine].flickHitted[note.Flick])
-                    {
-                        note.Judge();
-
-                        if(note.isHit)
+                        switch (note.Flick)
                         {
-                            Manager.lines[note.EndLine].SetFlickHit(note.Flick);
+                            case FlickType.Left:
+                                flickMovedDistance = flickStartPos.x - pos.x;
+                                break;
+                            case FlickType.Right:
+                                flickMovedDistance = pos.x - flickStartPos.x;
+                                break;
+                            case FlickType.Up:
+                                flickMovedDistance = pos.y - flickStartPos.y;
+                                break;
+                            case FlickType.Down:
+                                flickMovedDistance = flickStartPos.y - pos.y;
+                                break;
+                            case FlickType.Free:
+                                flickMovedDistance = Vector2.Distance(flickStartPos, pos);
+                                break;
+                        }
+
+                        if (flickMovedDistance >= Game.Mode.flickThreshold && note.TimeDistance >= -Game.Mode.judgeThreshold[5]
+                            && !Manager.lines[note.EndLine].flickHitted[note.Flick])
+                        {
+                            note.Judge();
+
+                            if (note.isHit)
+                            {
+                                Manager.lines[note.EndLine].SetFlickHit(note.Flick);
+                            }
                         }
                     }
                 }

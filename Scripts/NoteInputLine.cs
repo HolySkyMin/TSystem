@@ -22,8 +22,22 @@ namespace TSystem
             line = l;
 
             notes = new List<int>();
-            flickHitted = new Dictionary<FlickType, bool>();
-            flickCooltime = new Dictionary<FlickType, float>();
+            flickHitted = new Dictionary<FlickType, bool>()
+            {
+                { FlickType.Left, false },
+                { FlickType.Right, false },
+                { FlickType.Up, false },
+                { FlickType.Down, false },
+                { FlickType.Free, false }
+            };
+            flickCooltime = new Dictionary<FlickType, float>()
+            {
+                { FlickType.Left, 0f },
+                { FlickType.Right, 0f },
+                { FlickType.Up, 0f },
+                { FlickType.Down, 0f },
+                { FlickType.Free, 0f }
+            };
         }
 
         public void UpdateCooltime()
@@ -45,11 +59,6 @@ namespace TSystem
 
         public void SetFlickHit(FlickType type)
         {
-            if (!flickHitted.ContainsKey(type))
-            {
-                flickHitted.Add(type, false);
-                flickCooltime.Add(type, 0);
-            }
             flickHitted[type] = true;
             flickCooltime[type] = 0.06f;
         }
