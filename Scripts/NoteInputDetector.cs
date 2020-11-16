@@ -41,6 +41,8 @@ namespace TSystem
             if (!Manager.lines.ContainsKey(note.EndLine))
                 Manager.AddLine(note.EndLine);
             Manager.AddNote(note.EndLine, note.ID);
+
+            flickFinger = 100;
         }
 
 
@@ -214,6 +216,9 @@ namespace TSystem
 
         protected virtual void CheckFlick()
         {
+            if (note.Flick == FlickType.NotFlick)
+                return;
+
             foreach (var touch in validTouch)
             {
                 if(touch.phase == TouchPhase.Moved)
