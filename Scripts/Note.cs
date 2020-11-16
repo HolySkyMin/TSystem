@@ -429,10 +429,14 @@ namespace TSystem
         /// Judges the note by given judge result.
         /// As long as the judge is not silent, this note will be deleted after calling this.
         /// </summary>
-        /// <param name="fixAsMiss">Flag about if this note should be force-judged as miss.</param>
+        /// <param name="judgeType">Judge result.</param>
         /// <param name="silent">Flag about if this note should be judged without combo reset (and effect).</param>
         public void Judge(JudgeType judgeType, bool silent = false)
         {
+            // Avoid duplicated judging
+            if (isHit)
+                return;
+            // Cant judge when not judged
             if (judgeType == JudgeType.NotJudged)
                 return;
             

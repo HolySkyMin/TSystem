@@ -40,7 +40,7 @@ namespace TSystem
                     // Note garbage collection
                     while (line.notes.Count > 0 && (Game.notes[line.notes[0]].isHit || Game.notes[line.notes[0]].isDead))
                     {
-                        TSystemStatic.LogWarning($"Undeleted dead/hit note ({line.notes[0]}) detected in line {l.Key}! Removing it.");
+                        TSystemStatic.Log($"Undeleted dead/hit note ({line.notes[0]}, {Game.notes[line.notes[0]].Type}) detected in line {l.Key}! Removing it.");
                         RemoveNote(l.Key, line.notes[0]);
                     }
                 }
