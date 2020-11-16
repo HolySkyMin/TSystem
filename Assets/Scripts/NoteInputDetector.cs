@@ -35,9 +35,10 @@ namespace TSystem
 
         protected virtual void Start()
         {
-            if((int)note.Type < 10)
+            note = GetComponent<Note>();
+
+            if ((int)note.Type < 10)
             {
-                note = GetComponent<Note>();
                 validTouch = new List<Touch>();
 
                 if (!Manager.lines.ContainsKey(note.EndLine))
