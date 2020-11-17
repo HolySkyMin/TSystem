@@ -217,7 +217,7 @@ namespace TSystem
         protected virtual void CheckFlick()
         {
             // This note should be input target and able to be judged.
-            if (!Manager.IsInputTarget(note.EndLine, note.ID) && note.TimeDistance < -Game.Mode.judgeThreshold[5])
+            if (!Manager.IsInputTarget(note.EndLine, note.ID) || note.TimeDistance < -Game.Mode.judgeThreshold[5])
                 return;
 
             // Of course, flick note is only allowed.
@@ -287,9 +287,16 @@ namespace TSystem
 
         protected void StartFlick(Touch touch)
         {
-            flickStarted = true;
-            flickFinger = touch.fingerId;
-            flickStartPos = Game.GetTouchPos(touch.position);
+            if((note.Flick == FlickType.Left && touch.deltaPosition.x < 0)
+                || (note.Flick == FlickType.Right && touch.deltaPosition.x > 0)
+                || (note.Flick == FlickType.Up && touch.deltaPosition.y > 0)
+                || (note.Flick == FlickType.Down && touch.deltaPosition.y < 0)
+                || note.Flick == FlickType.Free)
+            {
+                flickStarted = true;
+                flickFinger = touch.fingerId;
+                flickStartPos = Game.GetTouchPos(touch.position - touch.deltaPosition);
+            }
         }
     }
 
