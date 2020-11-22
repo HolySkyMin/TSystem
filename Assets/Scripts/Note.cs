@@ -268,6 +268,9 @@ namespace TSystem
                     // When this note passed the judging line...
                     if(Progress >= 1)
                     {
+                        if (Game.Mode.enableStrictSlideJudge && !latestSlideJudge.IsEither(JudgeType.Fantastic, JudgeType.Perfect))
+                            Judge(JudgeType.Miss);
+
                         // Detach this note from slide group and
                         // connect previous note and next note for once.
                         if (!slideTransfered)
@@ -281,9 +284,11 @@ namespace TSystem
                     break;
                 case NoteType.SlideEnd:
                     // If the mode does not require release at this note and it passed the judging line...
-                    if (!Game.Mode.requireReleaseAtSlideEnd && Progress >= 1)
+                    if (!Game.Mode.requireReleaseAtSlideEnd && !isHit && Progress >= 1)
                     {
-                        if (!isHit && latestSlideJudge != JudgeType.NotJudged)
+                        if (Game.Mode.enableStrictSlideJudge && !latestSlideJudge.IsEither(JudgeType.Fantastic, JudgeType.Perfect))
+                            Judge(JudgeType.Miss);
+                        else if (latestSlideJudge != JudgeType.NotJudged)
                             Judge(latestSlideJudge);
                     }
                     break;
