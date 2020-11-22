@@ -193,7 +193,11 @@ namespace TSystem
                                 continue;
 
                             if (Game.Mode.requireHoldToSustainSlide)
-                                note.Judge(JudgeType.Miss);
+                            {
+                                Game.judge.UpdateJudgeResult(Mathf.RoundToInt(note.EndLine), JudgeType.Miss, false, false, false);
+                                note.isDead = true;
+                                note.Delete();
+                            }
                             else
                             {
                                 // Disable animation
