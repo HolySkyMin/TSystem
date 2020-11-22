@@ -273,7 +273,7 @@ namespace TSystem
 
                         // Detach this note from slide group and
                         // connect previous note and next note for once.
-                        if (!slideTransfered)
+                        if (!isHit && !slideTransfered)
                             TransferToBefore();
 
                         // Checks the latest slide judge every frame.
