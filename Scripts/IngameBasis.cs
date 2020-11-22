@@ -190,7 +190,7 @@ namespace TSystem
 
                 foreach (var note in notes)
                 {
-                    if (note.Value.Progress >= -0.004f && !note.Value.isAppeared)
+                    if (Time >= note.Value.appearTime && !note.Value.isAppeared)
                     {
                         note.Value.transform.SetAsFirstSibling();
                         note.Value.Wakeup();

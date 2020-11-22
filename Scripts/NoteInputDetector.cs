@@ -52,7 +52,10 @@ namespace TSystem
 
         protected virtual void Update()
         {
-            if(Game.IsAutoPlay)
+            if (Game.Paused)
+                return;
+
+            if (Game.IsAutoPlay)
             {
                 if((int)note.Type < 10 && note.Type != NoteType.Hidden)
                 {
@@ -64,6 +67,8 @@ namespace TSystem
 
             if ((int)note.Type >= 10)
                 return;
+
+            
 
             validTouch.Clear();
 
