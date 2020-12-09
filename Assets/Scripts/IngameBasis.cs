@@ -345,7 +345,7 @@ namespace TSystem
 
         public virtual void AddHoldingScore()
         {
-            TSystemStatic.Log("AddHoldingScore not implemented in this basis.");
+            //TSystemStatic.Log("AddHoldingScore not implemented in this basis.");
         }
     }
 }

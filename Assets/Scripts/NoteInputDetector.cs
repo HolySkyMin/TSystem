@@ -149,7 +149,7 @@ namespace TSystem
                     {
                         case NoteType.HoldStart:
                         case NoteType.SlideStart:
-                            // Do some hold score increment when the touch position is in the 'note'.
+                            // TODO: Do some hold score increment when the touch position is in the 'note'.
                             // This case, the note itself is already being hit.
                             break;
                         case NoteType.HoldEnd:
