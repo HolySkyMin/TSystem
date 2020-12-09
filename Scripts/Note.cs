@@ -222,8 +222,8 @@ namespace TSystem
                         slideGroupFinger = note.slideGroupFinger;
                 }
             }
-            //if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
-            //    Delete();
+            if (Type == NoteType.SlideStart && (nextNote.isDead || isDead))
+                Delete();
         }
 
         protected virtual void Move()
@@ -268,7 +268,8 @@ namespace TSystem
                     // When this note passed the judging line...
                     if(Progress >= 1)
                     {
-                        if (Game.Mode.enableStrictSlideJudge && !latestSlideJudge.IsEither(JudgeType.Fantastic, JudgeType.Perfect))
+                        if (Game.Mode.enableStrictSlideJudge && TimeDistance > Game.Mode.judgeHFSThreshold[1]
+                            &&!latestSlideJudge.IsEither(JudgeType.Fantastic, JudgeType.Perfect))
                             Judge(JudgeType.Miss);
 
                         // Detach this note from slide group and
@@ -286,7 +287,8 @@ namespace TSystem
                     // If the mode does not require release at this note and it passed the judging line...
                     if (!Game.Mode.requireReleaseAtSlideEnd && !isHit && Progress >= 1)
                     {
-                        if (Game.Mode.enableStrictSlideJudge && !latestSlideJudge.IsEither(JudgeType.Fantastic, JudgeType.Perfect))
+                        if (Game.Mode.enableStrictSlideJudge && TimeDistance > Game.Mode.judgeHFSThreshold[1] 
+                            && !latestSlideJudge.IsEither(JudgeType.Fantastic, JudgeType.Perfect))
                             Judge(JudgeType.Miss);
                         else if (latestSlideJudge != JudgeType.NotJudged)
                             Judge(latestSlideJudge);
