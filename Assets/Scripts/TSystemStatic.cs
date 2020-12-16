@@ -9,13 +9,14 @@ namespace TSystem
         public static IngamePacket ingamePacket;
         public static ResultPacket resultPacket;
 
-        public static string GetPlatformSpecificPath(string target)
+        public static string GetPlatformSpecificPath(string target, bool removeFileHeader = false)
         {
             switch(Application.platform)
             {
                 case RuntimePlatform.WindowsPlayer:
-                case RuntimePlatform.Android:
                     return target.Replace("\\", "/");
+                case RuntimePlatform.Android:
+                    return removeFileHeader ? target.Replace("\\", "/") : "file://" + target.Replace("\\", "/");
                 default:
                     return "file://" + target.Replace("\\", "/");
             }
