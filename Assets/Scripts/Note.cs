@@ -460,7 +460,7 @@ namespace TSystem
             if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && judgeType == JudgeType.Miss)
             {
                 isDead = true;  // This note is dead.
-                if (Type == NoteType.SlideMiddle)
+                if (Type == NoteType.SlideMiddle && Game.Mode.enableStrictSlideJudge)
                     foreach (var prev in previousNotes)
                         if (prev.Type == NoteType.SlideStart)
                             prev.isDead = true;  // If slide middle, previous note (that is, start) is also dead.
