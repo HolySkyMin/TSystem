@@ -406,7 +406,7 @@ namespace TSystem
 
             nextNote.previousNotes.Remove(this);
             nextNote.previousNotes.Add(prev);
-            previousNotes.Remove(prev);
+            //previousNotes.Remove(prev);
 
             slideTransfered = true;
         }
@@ -458,7 +458,13 @@ namespace TSystem
 
             // If the note is Start note and the result is Miss,
             if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart, NoteType.SlideMiddle) && judgeType == JudgeType.Miss)
+            {
                 isDead = true;  // This note is dead.
+                if (Type == NoteType.SlideMiddle)
+                    foreach (var prev in previousNotes)
+                        if (prev.Type == NoteType.SlideStart)
+                            prev.isDead = true;  // If slide middle, previous note (that is, start) is also dead.
+            }
 
             // If the note is Start note and the result is NOT Miss,
             if (Type.IsEither(NoteType.HoldStart, NoteType.SlideStart) && judgeType != JudgeType.Miss)

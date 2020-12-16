@@ -14,6 +14,7 @@ namespace TSystem
             switch(Application.platform)
             {
                 case RuntimePlatform.WindowsPlayer:
+                case RuntimePlatform.Android:
                     return target.Replace("\\", "/");
                 default:
                     return "file://" + target.Replace("\\", "/");
